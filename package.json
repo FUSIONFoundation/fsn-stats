@@ -1,0 +1,26 @@
+{
+  "name": "fsn-stats",
+  "version": "1.0.0",
+  "description": "Fusion's node monitor",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FUSIONFoundation/fsn-stats.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FUSIONFoundation/fsn-stats/issues"
+  },
+  "homepage": "https://github.com/FUSIONFoundation/fsn-stats#readme",
+  "dependencies": {
+    "http": "0.0.0",
+    "primus": "^7.3.3",
+    "primus-emit": "^1.0.0",
+    "websocket": "^1.0.30"
+  }
+}
