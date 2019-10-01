@@ -31,9 +31,10 @@
     "grunt-contrib-cssmin": "^0.12.3",
     "grunt-contrib-jade": "^0.14.1",
     "grunt-contrib-uglify": "^0.9.1",
+    "http2": "^3.3.7",
     "jade": "1.11.0",
     "lodash": "3.10.1",
-    "primus": "^6.0.5",
+    "primus": "^6.1.0",
     "primus-emit": "^1.0.0",
     "primus-spark-latency": "^0.1.1",
     "ws": "^1.1.1"

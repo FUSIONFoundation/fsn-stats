@@ -387,12 +387,12 @@ client.on('connection', function (clientSpark)
 
 var latencyTimeout = setInterval( function ()
 {
-    client.write({
-        action: 'client-ping',
-        data: {
-            serverTime: _.now()
-        }
-    });
+    // client.write({
+    //     action: 'client-ping',
+    //     data: {
+    //         serverTime: _.now()
+    //     }
+    // });
 }, 5000);
 
 
