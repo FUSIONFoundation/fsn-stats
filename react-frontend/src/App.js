@@ -1,99 +1,96 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { w3cwebsocket as W3CWebSocket } from "websocket";
+import {w3cwebsocket as W3CWebSocket} from "websocket";
 
 const client = new W3CWebSocket('ws://127.0.0.1:5000/primus');
 
-client.onopen = () => {
-    console.log('WebSocket Client Connected');
-};
-client.onmessage = (data) => {
-    socketAction(data.data)
-};
+class App extends React.Component {
+    constructor(props) {
+        super(props);
 
-function socketAction(data)
-{
-    let action = JSON.parse(data).action;
-    let nodeData = JSON.parse(data).data;
+        this.state = {
+            nodes: 'lol'
+        };
 
-    switch(action)
-    {
-        case "init":
-            console.log(action , nodeData);
-            break;
+        client.onopen = () => {
+            console.log('WebSocket Client Connected');
+        };
+        client.onmessage = (data) => {
+            socketAction(data.data)
+        };
 
-        case "add":
-            console.log(action , nodeData);
-            break;
+        function socketAction(data) {
+            let action = JSON.parse(data).action;
+            let nodeData = JSON.parse(data).data;
 
-        case "update":
-            console.log(action , nodeData);
-            break;
+            switch (action) {
+                case "init":
+                    console.log(action, nodeData);
+                    break;
 
-        case "block":
-        console.log(action , nodeData);
-        break;
+                case "add":
+                    console.log(action, nodeData);
+                    this.setState({'nodes': nodeData.id});
+                    break;
 
-        case "pending":
-            console.log(action , nodeData);
-            break;
+                case "update":
+                    console.log(action, nodeData);
+                    break;
 
-        case "stats":
-            console.log(action , nodeData);
-            break;
+                case "block":
+                    console.log(action, nodeData);
+                    this.setState({nodes: nodeData});
+                    break;
 
-        case "info":
-            console.log(action , nodeData);
-            break;
+                case "pending":
+                    console.log(action, nodeData);
+                    break;
 
-        case "blockPropagationChart":
-            console.log(action , nodeData);
-            break;
+                case "stats":
+                    console.log(action, nodeData);
+                    break;
 
-        case "uncleCount":
-            console.log(action , nodeData);
-            break;
+                case "info":
+                    console.log(action, nodeData);
+                    break;
 
-        case "charts":
-            console.log(action , nodeData);
-            break;
+                case "blockPropagationChart":
+                    console.log(action, nodeData);
+                    break;
 
-        case "inactive":
-            console.log(action , nodeData);
-            break;
+                case "uncleCount":
+                    console.log(action, nodeData);
+                    break;
 
-        case "latency":
-            console.log(action , nodeData);
-            break;
+                case "charts":
+                    console.log(action, nodeData);
+                    break;
 
-        case "client-ping":
-            console.log(action , nodeData);
-            break;
+                case "inactive":
+                    console.log(action, nodeData);
+                    break;
 
+                case "latency":
+                    console.log(action, nodeData);
+                    break;
+
+                case "client-ping":
+                    console.log(action, nodeData);
+                    break;
+
+            }
+
+        }
+    };
+
+    render() {
+        return (
+            <div className="component-app">
+                {this.state.nodes}
+            </div>
+        );
     }
-
-}
-
-function App() {
-    return (
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo"/>
-                <p>
-                    Edit <code>src/App.js</code> and save to reload.
-                </p>
-                <a
-                    className="App-link"
-                    href="https://reactjs.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn React
-                </a>
-            </header>
-        </div>
-    );
 }
 
 export default App;
