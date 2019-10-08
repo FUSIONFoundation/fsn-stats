@@ -34,6 +34,7 @@
     "http2": "^3.3.7",
     "jade": "1.11.0",
     "lodash": "3.10.1",
+    "pg": "^7.12.1",
     "primus": "^6.1.0",
     "primus-emit": "^1.0.0",
     "primus-spark-latency": "^0.1.1",

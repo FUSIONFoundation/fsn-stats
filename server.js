@@ -93,6 +93,7 @@ Nodes.setChartsCallback(function (err, charts)
             action: 'charts',
             data: charts
         });
+        //console.log(charts['miners']);
     }
 });
 
@@ -200,6 +201,7 @@ api.on('connection', function (spark)
 
                         Nodes.getCharts();
                     }
+                    //console.log(stats);
                 }
             });
         }
@@ -260,6 +262,7 @@ api.on('connection', function (spark)
 
                         console.success('API', 'STA', 'Stats from:', data.id);
                     }
+                    //console.log(stats);
                 }
             });
         }
@@ -273,6 +276,8 @@ api.on('connection', function (spark)
     spark.on('history', function (data)
     {
         console.success('API', 'HIS', 'Got history from:', data.id);
+        
+        //console.log(data);
 
         var time = chalk.reset.cyan((new Date()).toJSON()) + " ";
         console.time(time, 'COL', 'CHR', 'Got charts in');
@@ -408,6 +413,30 @@ var nodeCleanupTimeout = setInterval( function ()
 
 }, 1000*60*60);
 
+
+//console.log('SERVER = ',server);
 server.listen(process.env.PORT || 3000);
 
 module.exports = server;
+
+/*
+let WebSocketClient = require('websocket').w3cwebsocket;
+
+const wsclient = new WebSocketClient('ws://127.0.0.1:3000/primus');
+
+wsclient.onopen = () => {
+    console.log('WebSocket Client Connected');
+};
+
+wsclient.onerror = function() {
+    console.log('Connection Error');
+};
+
+wsclient.onmessage = function(data) {
+    //console.log("Received: " + data.data.length);
+};
+
+wsclient.onclose = function() {
+    console.log('Client Closed');
+};
+*/
