@@ -9,13 +9,13 @@ const pool = new Pool({
 });
 
 
-module.exports = {
-    query: (text, params, callback) => {
-        return pool.query(text, params, callback)
-    },
-      getClient: (callback) => {
-          pool.connect((err, client, done) => {
-              callback(err, client, done)
-          })
-      }
-}
+ module.exports = {
+     query: (text, params, callback) => {
+         return pool.query(text, params, callback)
+     },
+       getClient: (callback) => {
+           pool.connect((err, client, done) => {
+               callback(err, client, done)
+           })
+       }
+ }

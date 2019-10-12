@@ -14,17 +14,19 @@ var connect = function(){
     var blockNo = -1;
 
     wsclient.onopen = () => {
-        console.log(new Date(), ' WebSocket Client Connected');
+        console.log(new Date(), ` WebSocket Client Connected`);
     };
 
 
     wsclient.onerror = function() {
-        console.log(new Date(),' Connection Error');
+        console.log(new Date(),` Connection Error`);
     };
 
     wsclient.onmessage = function(data) {
-        now = new Date()
-        console.log(now, ' Received: ' + data.data.length, ' bytes');
+        
+        now = new Date();
+        
+        console.log(now, ` Received:  ${data.data.length} bytes`);
         let myData = JSON.parse(data.data);
         let currentAction = myData.action;
         console.log(`Current action is => ${currentAction}`);
@@ -47,12 +49,43 @@ var connect = function(){
                 myData.data.stats.mining,
                 myData.data.stats.syncing,
                 myData.data.stats.peers,
-                myticketno,
                 myData.data.stats.uptime,
-                myData.data.stats.latency
+                parseInt(myData.data.stats.latency),
+                myticketno
             ];
-            pop.nodePutDb(record);
-                
+            //console.log(record);
+            pop.nodeGetDb(myData.data.id)
+            .then( res => {
+                if (res === 0) {
+                    console.log(`User id '${record[0]}' not found`)
+                    pop.nodePostDb(record)
+                    .then( res => {
+                        console.log(`Posted initial row`)
+                    })
+                    .catch( err => {
+                        console.log(err.stack);
+                    })
+                }
+                else {
+                    pop.nodeUpdateDb(record)
+                    .then( res => {
+                        console.log(`Updated row`)
+                    })
+                    .catch( err => {
+                        console.log(err.stack);
+                    })
+                }
+            })
+            .catch( err => {
+                console.error(`Error = ${err}`)
+                pop.nodePostDb(record)
+                .then( res => {
+                    console.log(`Inserted a new record`);
+                })
+                .catch( err => {
+                    console.log(err.stack);
+                })
+            })
         }
         keepAlive();
     };

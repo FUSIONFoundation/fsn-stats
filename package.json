@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/FUSIONFoundation/fsn-stats#readme",
   "dependencies": {
+    "auto-bind": "^2.1.1",
     "body-parser": "^1.18.3",
     "chalk": "1.1.1",
     "d3": "3.5.6",
