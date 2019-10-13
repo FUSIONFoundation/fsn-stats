@@ -9,8 +9,11 @@ var reconnectInterval = 1000 * 10;
 
 var connect = function(){
 
-    const wsclient = new WebSocketClient('ws://127.0.0.1:3000/primus');
-    var timerID = 0;
+    //const wsclient = new WebSocketClient('ws://127.0.0.1:3000/primus');
+    const wsclient = new WebSocketClient('wss://node.fusionnetwork.io/primus');
+    
+    olderThanHours = 3;    // Remove nodes inactive for olderThanHours hours
+    var timerId = 0;
     var blockNo = -1;
 
     wsclient.onopen = () => {
@@ -35,9 +38,9 @@ var connect = function(){
             blockNo = myData.data.block.number;
         };
         if (myData.data.id && currentAction === 'stats') {
-            console.log(`User ID => ${myData.data.id}, Tickets => ${myData.data.stats.myTicketNumber}, Peers => ${myData.data.stats.peers}`);
+            //console.log(`User ID => ${myData.data.id}, Tickets => ${myData.data.stats.myTicketNumber}, Peers => ${myData.data.stats.peers}`);
             if (myData.data.stats.myTicketNumber == 'N/A') {
-                myticketno = [-1];
+                myticketno = -1;
             }
             else {
                 myticketno = myData.data.stats.myTicketNumber;
@@ -60,16 +63,22 @@ var connect = function(){
                     console.log(`User id '${record[0]}' not found`)
                     pop.nodePostDb(record)
                     .then( res => {
-                        console.log(`Posted initial row`)
+                        console.log(`Posted initial row for '${record[0]}'`)
                     })
                     .catch( err => {
-                        console.log(err.stack);
+                        if (err == -1) {
+                            console.log(`Ignoring INSERT request`);
+                        }
+                        else {
+                            console.log(err.stack);
+                        }
                     })
                 }
                 else {
+                    //console.log(res);
                     pop.nodeUpdateDb(record)
                     .then( res => {
-                        console.log(`Updated row`)
+                        console.log(`Updated row ${myData.data.id}`)
                     })
                     .catch( err => {
                         console.log(err.stack);
@@ -87,8 +96,21 @@ var connect = function(){
                 })
             })
         }
-        keepAlive();
     };
+    
+    function removeOldNodes(olderThanHours) {
+        var checkTime = 1*60*1000;    // 1 minute
+        setTimeout((olderThanHours) => {
+            removeOldNodes(olderThanHours);
+            pop.nodeDeleteOldNodes(this.olderThanHours)
+            .then( res => {
+                console.log(`Removed old nodes ${res}`);
+            })
+            .catch( err => {
+                console.log(err.stack);
+            })
+        }, checkTime)
+    }
 
     function keepAlive() {
         var timeout = 10000;
@@ -110,6 +132,9 @@ var connect = function(){
             clearTimeout(timerId);
         }
     }
+    
+    removeOldNodes(olderThanHours);
+    keepAlive();
 };
 
 connect();
