@@ -63,15 +63,22 @@ var connect = function(){
                     console.log(`User id '${record[0]}' not found`)
                     pop.nodePostDb(record)
                     .then( res => {
-                        console.log(`Posted initial row for '${record[0]}'`)
-                    })
-                    .catch( err => {
-                        if (err == -1) {
-                            console.log(`Ignoring INSERT request`);
+                        if (res == -1) {
+                            console.log(`Ignoring INSERT request, updating instead`);
+                            pop.nodeUpdateDb(record)
+                            .then( res => {
+                                console.log(`Updated row ${myData.data.id}`)
+                            })
+                            .catch( err => {
+                                console.log(err.stack);
+                            })
                         }
                         else {
-                            console.log(err.stack);
+                            console.log(`Posted initial row for '${record[0]}'`);
                         }
+                    })
+                    .catch( err => {
+                        console.log(err.stack);
                     })
                 }
                 else {
