@@ -4,7 +4,7 @@ import {
     Row,
     Col,
     Container,
-    Spinner,
+    Badge,
     Button,
     Nav,
     Navbar,
@@ -14,72 +14,130 @@ import {
     Form,
     FormControl
 } from 'react-bootstrap'
+import CountUp from 'react-countup';
 import Skeleton, {SkeletonTheme} from 'react-loading-skeleton';
+import TimeAgo from 'react-timeago'
+import Spinner from './Spinner';
+import {BarChart, ComposedChart, ResponsiveContainer, Line, Bar, Tooltip, YAxis, Legend, XAxis, CartesianGrid} from 'recharts';
 import FontAwesome from 'react-loading-skeleton';
 import * as Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
 let W3CWebSocket = require('websocket').w3cwebsocket;
 
+
 class Main extends React.Component {
     constructor(props) {
         super(props);
-        let client = new W3CWebSocket('wss://node.fusionnetwork.io/primus');
 
         let allNodes = [];
         let identifiers = [];
-        client.onmessage = (data) => {
-            let action = JSON.parse(data.data).action;
-            if (action === 'charts') {
-                let chartData = JSON.parse(data.data).data;
-                let highestBlock = Math.max(...chartData.height);
-                let heightChart = chartData.height;
-                let avgBlockTime = chartData.avgBlocktime.toString().substr(0, 5);
-                let difficulty = Math.max(...chartData.difficulty);
 
-                this.setState({
-                    highestBlock: highestBlock,
-                    chartData: heightChart,
-                    avgBlockTime: avgBlockTime,
-                    difficulty: difficulty
-                });
-            }
+        const keepAlive = () => {
+            let client = new W3CWebSocket('wss://node.fusionnetwork.io/primus');
 
-            if (action === 'stats') {
-                let id = JSON.parse(data.data).data.id;
-                let stats = JSON.parse(data.data).data.stats;
-                stats.id = id;
+            client.onmessage = (data) => {
+                let action = JSON.parse(data.data).action;
+                // console.log(action);
+                if (action === 'charts') {
+                    let chartData = JSON.parse(data.data).data;
+                    let highestBlock = Math.max(...chartData.height);
+                    let heightChart = chartData.height;
+                    let avgBlockTime = chartData.avgBlocktime.toString().substr(0, 5);
+                    let difficulty = Math.max(...chartData.difficulty);
 
-                let objIndex = allNodes.findIndex((value => value.id === id));
-                if (objIndex === -1) {
-                    allNodes.push(stats);
-                    objIndex = allNodes.findIndex((value => value.id === id));
-                    identifiers[objIndex] = id;
-                } else {
-                    objIndex = allNodes.findIndex((value => value.id === id));
-                    identifiers[objIndex] = id;
-                }
-                this.setState({
-                    totalNodes: Object.keys(allNodes).length,
-                    nodeIdentifiers: identifiers,
-                    nodesList: allNodes
-                });
-            }
-            if (action === 'block') {
-                let blockData = JSON.parse(data.data).data;
-                let objIndex = allNodes.findIndex((value => value.id === blockData.id));
-                if(objIndex === -1){
+                    let blocksChart = [];
 
-                } else {
-                    console.log(objIndex);
-                    allNodes[objIndex].height = blockData.block.number;
+                    for (let i in chartData.blocktime) {
+                        blocksChart[i] = {
+                            "blocktime": chartData.blocktime[i],
+                            "height": chartData.height[i]
+                        };
+                    }
+
                     this.setState({
-                        nodesList: allNodes
-                    })
-                    this.forceUpdate()
+                        highestBlock: highestBlock,
+                        chartData: heightChart,
+                        avgBlockTime: avgBlockTime,
+                        difficulty: difficulty,
+                        avgBlockTimeChart: blocksChart
+                    });
                 }
+
+                if (action === 'stats') {
+                    let id = JSON.parse(data.data).data.id;
+                    let stats = JSON.parse(data.data).data.stats;
+                    stats.id = id;
+
+                    // if (allNodes.length > 5) return;
+
+                    let objIndex = allNodes.findIndex((value => value.id === id));
+                    if (objIndex === -1) {
+                        allNodes.push(stats);
+                        objIndex = allNodes.findIndex((value => value.id === id));
+                        identifiers[objIndex] = id;
+                    } else {
+                        objIndex = allNodes.findIndex((value => value.id === id));
+                        identifiers[objIndex] = id;
+                    }
+                    this.setState({
+                        totalNodes: Object.keys(allNodes).length,
+                        nodeIdentifiers: identifiers,
+                        nodesList: allNodes
+                    });
+                }
+                if (action === 'block') {
+                    let blockData = JSON.parse(data.data).data;
+                    let objIndex = allNodes.findIndex((value => value.id === blockData.id));
+                    if (objIndex === -1) {
+
+                    } else {
+                        let propagationChart = [];
+                        for (let i in blockData.history) {
+                            propagationChart[i] = {
+                                "id": i,
+                                "value": blockData.history[i]
+                            };
+                        }
+
+                        allNodes[objIndex].height = blockData.block.number;
+                        allNodes[objIndex].propagationChart = propagationChart;
+                        allNodes[objIndex].hash = formatHash(blockData.block.hash);
+                        allNodes[objIndex].blockLastUpdated = (blockData.block.timestamp * 1000);
+                        console.log(allNodes);
+                        this.setState({
+                            nodesList: allNodes
+                        })
+                        this.forceUpdate()
+                    }
+                }
+                if (action === 'update') {
+                    let info = JSON.parse(data.data);
+                    console.log(info);
+                }
+                if (action === 'init') {
+
+                }
+                if (action === 'info') {
+                    let info = JSON.parse(data.data);
+                    console.log(info);
+                }
+            }
+
+            client.onclose = () => {
+                console.log('closed...');
+                keepAlive();
+            }
+
+            const formatHash = (hash) => {
+                let a = hash.length;
+                let b = hash.substr(0, 4);
+                let c = b + ' ... ' + hash.substr(a - 4, a);
+                return c;
             }
         }
+
+        keepAlive();
     }
 
     state = {
@@ -90,89 +148,177 @@ class Main extends React.Component {
         nodesList: [],
         nodeIdentifiers: [],
         totalNodes: undefined,
+        avgBlockTimeChart: []
     }
 
     render() {
-        return <div>
+        const RoundedBar = (props) => {
+            const {fill, x, y, height} = props;
+
+            return (
+                <g>
+                    <rect id="Rectangle-3" x={x} y={y} width="3" height={height} fill={fill} rx="1"/>
+                    <rect id="Rectangle-3" x={x - 1} y="0" width="4" height="80" fill={fill} fillOpacity="0" rx="1"/>
+                </g>
+            );
+        };
+        return <body className={'bg-dark'}>
+        <div className={'main-content'}>
             <SkeletonTheme color="#202020" highlightColor="#444">
-                <Navbar bg="primary" expand="lg">
-                    <Container>
-                        <Navbar.Brand href="#home">FUSION Network Monitor</Navbar.Brand>
-                        <div>
-                            <span>{this.state.totalNodes || <Skeleton width={20}/>}</span>
-                        </div>
-                    </Container>
-                </Navbar>
-                <Container>
+                <Container fluid={true}>
                     <Row>
-                        <Col md={3}>
-                            <Card>
-                                <Card.Body>
-                                    <Card.Title>Highest Block</Card.Title>
-                                    <Card.Text>
-                                        {this.state.highestBlock || <Skeleton/>}
-                                    </Card.Text>
-                                </Card.Body>
-                            </Card>
+                        <Col md={12}>
+                            <div className="alert alert-primary mt-2">
+                                Work in progress!
+                            </div>
                         </Col>
                         <Col md={3}>
-                            <Card>
-                                <Card.Body>
-                                    <Card.Title>Average Block Time</Card.Title>
-                                    <Card.Text>
-                                        {this.state.avgBlockTime || <Skeleton/>}
-                                    </Card.Text>
-                                </Card.Body>
-                            </Card>
+                            <div className="card">
+                                <div className="card-header">
+                                    <div className="row align-items-center">
+                                        <div className="col">
+                                            <h4 className="card-header-title">
+                                                Blocks
+                                            </h4>
+                                        </div>
+                                        <div className="col-auto">
+                                            {this.state.highestBlock || <Spinner/>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="card-body">
+                                    {this.state.highestBlock}
+                                </div>
+                            </div>
                         </Col>
                         <Col md={3}>
-                            <Card>
-                                <Card.Body>
-                                    <Card.Title>Difficulty</Card.Title>
-                                    <Card.Text>
-                                        {this.state.difficulty || <Skeleton/>}
-                                    </Card.Text>
-                                </Card.Body>
-                            </Card>
+                            <div className="card">
+                                <div className="card-header">
+                                    <div className="row align-items-center">
+                                        <div className="col">
+                                            <h4 className="card-header-title">
+                                                Blocks
+                                            </h4>
+                                        </div>
+                                        <div className="col-auto">
+                                            {this.state.highestBlock || <Spinner/>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="card-body">
+                                    {this.state.highestBlock}
+                                </div>
+                            </div>
                         </Col>
                         <Col md={3}>
-                            <Card>
-                                <Card.Body>
-                                    <Card.Title>Average Block Time</Card.Title>
-                                    <Card.Text>
-                                        {this.state.avgBlockTime || <Skeleton/>}
-                                    </Card.Text>
-                                </Card.Body>
-                            </Card>
+                            <div className="card">
+                                <div className="card-header">
+                                    <div className="row align-items-center">
+                                        <div className="col">
+                                            <h4 className="card-header-title">
+                                                Average Block Time
+                                            </h4>
+                                        </div>
+                                        <div className="col-auto">
+                                            {this.state.avgBlockTime ||
+                                            <div className="spinner-border spinner-border-sm" role="status">
+                                                <span className="sr-only">Loading...</span>
+                                            </div>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="card-body">
+                                    <BarChart width={400} height={75}
+                                              data={this.state.avgBlockTimeChart}
+                                              margin={{top: 0, right: 0, left: 0, bottom: 0}}
+                                              className="pointer">
+                                        <Bar dataKey="blocktime" minPointSize={3}
+                                             isAnimationActive={true}
+                                             fill={'#34958e'} shape={<RoundedBar/>}/>}
+                                    </BarChart>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col md={3}>
+                            <div className="card">
+                                <div className="card-header">
+                                    <div className="row align-items-center">
+                                        <div className="col">
+                                            <h4 className="card-header-title">
+                                                Difficulty
+                                            </h4>
+                                        </div>
+                                        <div className="col-auto">
+                                            {this.state.difficulty || <Spinner/>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="card-body">
+                                </div>
+                            </div>
                         </Col>
                     </Row>
-                    <Col className={'table-width'} md={12}>
-                        <Table className={'table-width'} borderless variant="">
-                            <thead>
+                    <Col className={'table-responsive'} md={12}>
+                        <Table className={'table table-sm table-nowrap card-table'} borderless variant="">
+                            <thead className={'text-center text-muted'}>
                             <tr>
-                                <th>Active</th>
+                                <th>Pin</th>
+                                <th data-toggle="tooltip" data-placement="top" title=""
+                                    data-original-title="Tooltip on top">Active
+                                </th>
                                 <th>ID</th>
                                 <th>Height</th>
+                                <th>Block Time</th>
                                 <th>Tickets</th>
+                                <th>Mining</th>
                                 <th>Syncing</th>
                                 <th>Peers</th>
+                                <th>Propagation</th>
                                 <th>Uptime</th>
+                                <th>Latency</th>
                             </tr>
                             </thead>
-                            <tbody>
+                            <tbody className={'text-center'}>
                             {
                                 this.state.nodeIdentifiers.map(((key, index) =>
                                         <tr>
-                                            <td>{this.state.nodesList[index].active ? 'true' : 'false'}</td>
-                                            <td>{this.state.nodesList[index].id}</td>
-                                            <td># {this.state.nodesList[index].height || 'loading'}</td>
+                                            <td><a href="#" className="btn btn-sm btn-rounded-circle btn-white">
+                                                +
+                                            </a></td>
+                                            <td className={'goal-project'}>{this.state.nodesList[index].active ?
+                                                <span className="text-success">●</span> :
+                                                <span className="text-danger">●</span>}</td>
+                                            <td className={'id'}>{this.state.nodesList[index].id}</td>
+                                            <td>{this.state.nodesList[index].height ||
+                                            <Spinner/>} {this.state.nodesList[index].hash}</td>
+                                            <td>{this.state.nodesList[index].blockLastUpdated ?
+                                                <TimeAgo date={this.state.nodesList[index].blockLastUpdated}/> :
+                                                <Spinner/>}</td>
                                             <td>{this.state.nodesList[index].myTicketNumber}</td>
-                                            <td>{this.state.nodesList[index].syncing ? 'true' :
-                                                'false'}</td>
+                                            <td>{this.state.nodesList[index].mining ?
+                                                <span className="text-success">●</span> :
+                                                <span className="text-danger">●</span>}</td>
+                                            <td>{this.state.nodesList[index].syncing ?
+                                                <span className="text-success">●</span> :
+                                                <span className="text-danger">●</span>}</td>
                                             <td>{this.state.nodesList[index].peers}</td>
-                                            <td>{this.state.nodesList[index].uptime}</td>
+                                            <td className={'recharts-wrapper'}>
+                                                {!this.state.nodesList[index].propagationChart ? <Spinner/> :
+                                                        <BarChart width={200} height={15}
+                                                                  data={this.state.nodesList[index].propagationChart}
+                                                                  margin={{top: 0, right: 0, left: 0, bottom: 0}}
+                                                                  className="pointer">
+                                                            <Bar dataKey="id" minPointSize={3}
+                                                                 isAnimationActive={true}
+                                                                 fill={'#34958e'} shape={<RoundedBar/>}/>}
+                                                        </BarChart>
+                                                }
+                                            </td>
+                                            <td>{this.state.nodesList[index].uptime}%</td>
+                                            <td>{this.state.nodesList[index].latency}
+                                                <small>ms</small>
+                                            </td>
                                         </tr>
-                                    // <div>{JSON.stringify(this.state.nodesList[this.state.nodeIdentifiers[key]])}</div>
                                 ))
                             }
                             </tbody>
@@ -180,7 +326,8 @@ class Main extends React.Component {
                     </Col>
                 </Container>
             </SkeletonTheme>
-        </div>;
+        </div>
+        </body>;
     }
 }
 
