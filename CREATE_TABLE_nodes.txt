@@ -8,5 +8,6 @@ CREATE TABLE nodes (
     uptime      BIGINT,
     latency     BIGINT,
     tickets     BIGINT,
+    info        TEXT
     PRIMARY KEY (id)
 );

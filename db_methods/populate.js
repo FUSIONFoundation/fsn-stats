@@ -37,7 +37,7 @@ class Populate  {
                         })
                         .catch(err => {
                              client.release();
-                             console.error(`Query SELECT : Postgres failed`);
+                             console.error(`Query SELECT node: Postgres failed`);
                              reject(err);
                         });
                 }
@@ -84,7 +84,7 @@ class Populate  {
                             })
                             .catch(err => {
                                 client.release();
-                                console.error(`Query UPDATE : Postgres failed`);
+                                console.error(`Query UPDATE node: Postgres failed`);
                                 reject(err);
                                 return;
                             });
@@ -104,7 +104,7 @@ class Populate  {
                             })
                             .catch(err => {
                                 client.release();
-                                console.error(`Query INSERT INTO : Postgres failed`);
+                                console.error(`Query INSERT INTO node: Postgres failed`);
                                 reject(err);
                                 return;
                             });
@@ -112,7 +112,7 @@ class Populate  {
                     })
                     .catch(err => {
                         client.release();
-                        console.error(`Query SELECT : Postgres failed`);
+                        console.error(`Query SELECT node: Postgres failed`);
                         reject(err);
                         return;
                     })
@@ -154,7 +154,7 @@ class Populate  {
                         })
                         .catch(err => {
                              client.release();
-                             console.error(`Query UPDATE : Postgres failed`);
+                             console.error(`Query UPDATE node: Postgres failed`);
                              reject(err);
                              return;
                         });
@@ -162,6 +162,42 @@ class Populate  {
             });
         });
     }
+  
+      
+    initUpdateDb(record) {
+        return new Promise(function(resolve, reject) {
+            db.getClient((err,client,done) => {
+                if (err) {
+                    console.log(err.stack);
+                    console.error('Could not connect to postgres', err);
+                    reject(err);
+                    return;
+                }
+                else {
+                    var datenow = record[1].toISOString()
+                    
+                    const query = 
+                         `UPDATE nodes SET info  = ${record[1]} WHERE id = '${record[0]}'`;
+                    //console.log(query);
+                    client.query(query)
+                        .then(res => {
+                            client.release();
+                            resolve(1);
+                            return;
+                        })
+                        .catch(err => {
+                             client.release();
+                             console.error(`Query UPDATE init: Postgres failed`);
+                             reject(err);
+                             return;
+                        });
+                }
+            });
+        });
+    }
+  
+  
+  
   
   
     nodeDeleteDb(id) {
@@ -181,7 +217,7 @@ class Populate  {
                         })
                         .catch(err => {
                              client.release();
-                             console.error(`Query DELETE : Postgres failed`);
+                             console.error(`Query DELETE node: Postgres failed`);
                              reject(err);
                         });
                 }
