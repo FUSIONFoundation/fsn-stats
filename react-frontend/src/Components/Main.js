@@ -16,6 +16,7 @@ import {
     FormControl
 } from 'react-bootstrap'
 import Fade from 'react-reveal/Fade';
+import axios from 'axios';
 import CountUp from 'react-countup';
 import Skeleton, {SkeletonTheme} from 'react-loading-skeleton';
 import TimeAgo from 'react-timeago'
@@ -46,6 +47,10 @@ class Main extends React.Component {
 
         let allNodes = [];
         let identifiers = [];
+
+//         axios.get('http://93.89.252.58:3002/nodes').then(function(data){
+// console.log(data);
+//         });
 
         const keepAlive = () => {
             let client = new W3CWebSocket('wss://node.fusionnetwork.io/primus');
