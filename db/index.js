@@ -6,7 +6,7 @@ const pool = new Pool({
     port:       5432,
     database:   'myfusiondatabase',
     password:   process.env.SQLPASS,
-    max:        1
+    max:        5
 });
 
 

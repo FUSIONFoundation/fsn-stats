@@ -5,7 +5,7 @@ Fusion's node monitor
 
 For a local test run :-
 
-Create the postgreSQL database called myfusiondatabase. Create 3 tables using pgadmin4 in it called nodes, blocks, charts. The definitions are inCREATE_TABLE_nodes, CREATE_TABLE_blocks, CREATE_TABLE_charts
+Create the postgreSQL database called myfusiondatabase. Create 3 tables using pgadmin4 in it called nodes, blocks, charts. The definitions are in CREATE_TABLE_nodes, CREATE_TABLE_blocks, CREATE_TABLE_charts
 
 #SHELL 1
 

@@ -68,6 +68,14 @@ app.get('/info', (req, res, next) => {
     
 });
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, X-Content-Type-Options, Content-Type, Accept, Authorization");
+    // Pass to next layer of middleware
+  next();
+});
+
 // setTimeout(() => {
 //             console.log(`Closing express server now`);
 //             server.close();

@@ -27,7 +27,7 @@ class Retrieve  {
                     client.query(query)
                         .then(res => {
                             client.release();
-                            let json_data = JSON.stringify(res);
+                            let json_data = JSON.stringify(res.rows);
                             resolve(json_data)
                         })
                         .catch(err => {
@@ -53,7 +53,7 @@ class Retrieve  {
                     client.query(query)
                         .then(res => {
                             client.release();
-                            let json_data = JSON.stringify(res);
+                            let json_data = JSON.stringify(res.rows);
                             resolve(json_data)
                         })
                         .catch(err => {
@@ -79,7 +79,7 @@ class Retrieve  {
                     client.query(query)
                         .then(res => {
                             client.release();
-                            let json_data = JSON.stringify(res);
+                            let json_data = JSON.stringify(res.rows);
                             resolve(json_data)
                         })
                         .catch(err => {
@@ -105,7 +105,7 @@ class Retrieve  {
                     client.query(query)
                         .then(res => {
                             client.release();
-                            let json_data = JSON.stringify(res);
+                            let json_data = JSON.stringify(res.rows);
                             resolve(json_data)
                         })
                         .catch(err => {
