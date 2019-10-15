@@ -27,6 +27,8 @@ var connect = function(){
 
     wsclient.onmessage = function(data) {
         
+        //console.log(data.data);
+        
         now = new Date();
         
         console.log(now, ` Received:  ${data.data.length} bytes`);
@@ -39,8 +41,25 @@ var connect = function(){
             blockNo = myData.data.block.number;
         };
         
-        if (myData.data.id && currentAction === 'info') {
-            console.log(`Info. => ${myData.data.info}`);
+        if (currentAction === 'init') {
+            console.log(`Init. => ${myData.data[0]}`);
+            record = [
+                myData.data[0].id,
+                myData.data[0]
+            ]
+            pop.initUpdateDb(record)
+            .then( res => {
+                if (res == 1) {
+                    console.log(`Update init record '${record[0]}'`);
+                }
+                else {
+                    console.log(`Unidentified return from initUpdateDb = ${res}`);
+                }
+            })
+            .catch( err => {
+                console.log(err.stack);
+                return;
+            })
         };
         
         if (myData.data.id && currentAction === 'stats') {
@@ -67,7 +86,7 @@ var connect = function(){
             pop.nodePostDb(record)
             .then( res => {
                 if (res == 1) {
-                    console.log(`Posted '${record[0]}'`);
+                    //console.log(`Posted`);
                 }
                 else {
                     console.log(`Unidentified return from nodePostDb = ${res}`);
