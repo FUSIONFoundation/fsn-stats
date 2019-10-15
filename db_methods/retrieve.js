@@ -49,7 +49,7 @@ class Retrieve  {
                     reject(err);
                 }
                 else {
-                    const query = `SELECT height, blocktime, difficulty, transactions, gasspending, gaslimit, ticketnumber FROM blocks`;
+                    const query = `SELECT height, blocktime, difficulty, transactions, gasspending, gaslimit, ticketnumber, unclecount, uncles FROM blocks`;
                     client.query(query)
                         .then(res => {
                             client.release();

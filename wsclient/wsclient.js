@@ -108,7 +108,9 @@ var connect = function(){
                 transactions:   myData.data.transactions,
                 gasSpending:    myData.data.gasSpending,
                 gasLimit:       myData.data.gasLimit,
-                ticketNumber:   myData.data.ticketNumber
+                ticketNumber:   myData.data.ticketNumber,
+                uncleCount:     myData.data.uncleCount,
+                uncles:         myData.data.uncles
             }
             pop.blockPostDb(record)
             .then( res => {

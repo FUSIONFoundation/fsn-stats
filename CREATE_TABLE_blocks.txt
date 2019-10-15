@@ -6,4 +6,6 @@ CREATE TABLE blocks (
     gasspending     BIGINT,
     gaslimit        BIGINT,
     ticketnumber    BIGINT,
+    unclecount      BIGINT,
+    uncles          BIGINT
 );

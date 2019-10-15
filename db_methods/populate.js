@@ -258,7 +258,7 @@ class Populate  {
                     reject(err);
                 }
                 else {
-                    let block_text ='blocks(height, blocktime, difficulty, transactions, gasspending, gaslimit, ticketnumber) VALUES($1, $2, $3, $4, $5, $6, $7)';
+                    let block_text ='blocks(height, blocktime, difficulty, transactions, gasspending, gaslimit, ticketnumber, unclecount, uncles) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)';
                     let block_values;
                     
                     let query = `DELETE FROM blocks`;
@@ -275,7 +275,7 @@ class Populate  {
                     
                     for (let i=0; i<record.height.length; i++) {
                         //console.log(`i = ${i}`);
-                        block_values = [record.height[i], record.blocktime[i], record.difficulty[i], record.transactions[i], record.gasSpending[i], record.gasLimit[i], record.ticketNumber[i]];
+                        block_values = [record.height[i], record.blocktime[i], record.difficulty[i], record.transactions[i], record.gasSpending[i], record.gasLimit[i], record.ticketNumber[i], record.uncleCount[i], record.uncles[i]];
 
                         query = {
                             text: `INSERT INTO ${block_text}`,
