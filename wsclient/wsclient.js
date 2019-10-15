@@ -33,12 +33,18 @@ var connect = function(){
         let myData = JSON.parse(data.data);
         let currentAction = myData.action;
         console.log(`Current action is => ${currentAction}`);
+        
         if (myData.data.id && currentAction === 'block') {
             console.log(`Block No. => ${myData.data.block.number}`);
             blockNo = myData.data.block.number;
         };
+        
+        if (myData.data.id && currentAction === 'info') {
+            console.log(`Info. => ${myData.data.info}`);
+        };
+        
         if (myData.data.id && currentAction === 'stats') {
-            //console.log(`User ID => ${myData.data.id}, Tickets => ${myData.data.stats.myTicketNumber}, Peers => ${myData.data.stats.peers}`);
+            console.log(`User ID => ${myData.data.id}`);
             if (myData.data.stats.myTicketNumber == 'N/A') {
                 myticketno = -1;
             }
@@ -57,52 +63,78 @@ var connect = function(){
                 myticketno
             ];
             //console.log(record);
-            pop.nodeGetDb(myData.data.id)
+            
+            pop.nodePostDb(record)
             .then( res => {
-                if (res === 0) {
-                    console.log(`User id '${record[0]}' not found`)
-                    pop.nodePostDb(record)
-                    .then( res => {
-                        if (res == -1) {
-                            console.log(`Ignoring INSERT request, updating instead`);
-                            pop.nodeUpdateDb(record)
-                            .then( res => {
-                                console.log(`Updated row ${myData.data.id}`)
-                            })
-                            .catch( err => {
-                                console.log(err.stack);
-                            })
-                        }
-                        else {
-                            console.log(`Posted initial row for '${record[0]}'`);
-                        }
-                    })
-                    .catch( err => {
-                        console.log(err.stack);
-                    })
+                if (res == 1) {
+                    console.log(`Posted '${record[0]}'`);
                 }
                 else {
-                    //console.log(res);
-                    pop.nodeUpdateDb(record)
-                    .then( res => {
-                        console.log(`Updated row ${myData.data.id}`)
-                    })
-                    .catch( err => {
-                        console.log(err.stack);
-                    })
+                    console.log(`Unidentified return from nodePostDb = ${res}`);
                 }
             })
             .catch( err => {
-                console.error(`Error = ${err}`)
-                pop.nodePostDb(record)
+                console.log(err.stack);
+                return;
+            })
+                
+        }    // End of currentAction === 'stats'
+        
+        else if (currentAction === 'charts') {
+            //console.log(`Height => ${myData.data.height}`);
+            record = {
+                height:         myData.data.height,
+                blocktime:      myData.data.blocktime,
+                difficulty:     myData.data.difficulty,
+                transactions:   myData.data.transactions,
+                gasSpending:    myData.data.gasSpending,
+                gasLimit:       myData.data.gasLimit,
+                ticketNumber:   myData.data.ticketNumber
+            }
+            pop.blockPostDb(record)
+            .then( res => {
+                if (res == 0) {
+                    console.log(`Block data write finished`);
+                }
+            })
+            .catch( err => {
+                console.log(err.stack);
+            })
+            
+                let histogram = myData.data.propagation.histogram; 
+                //console.log(histogram);
+                var x=[];var dx=[];var y=[];var frequency= [];var cumulative=[];var cumpercent=[];
+                for(let i=0;i<histogram.length;i++) {
+                    x.push(histogram[i].x);
+                    dx.push(histogram[i].dx);
+                    y.push(histogram[i].y);
+                    frequency.push(histogram[i].frequency);
+                    cumulative.push(histogram[i].cumulative);
+                    cumpercent.push(histogram[i].cumpercent);
+                }
+                
+                record = {
+                    x:              x,
+                    dx:             dx,
+                    y:              y,
+                    frequency:      frequency,
+                    cumulative:     cumulative,
+                    cumpercent:     cumpercent
+                }
+                //console.log(record);
+                pop.chartPostDb(record)
                 .then( res => {
-                    console.log(`Inserted a new record`);
+                    if (res == 0) {
+                        console.log(`Chart data write finished`);
+                    }
                 })
                 .catch( err => {
                     console.log(err.stack);
                 })
-            })
-        }
+        
+        
+        }  // End of currentAction === 'charts' 
+        
     };
     
     function removeOldNodes(olderThanHours) {

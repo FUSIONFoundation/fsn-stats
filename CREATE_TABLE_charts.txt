@@ -1,0 +1,9 @@
+CREATE TABLE charts (
+    x               DOUBLEPRECISION,
+    dx              DOUBLEPRECISION,
+    y               DOUBLEPRECISION,
+    frequency       DOUBLEPRECISION,
+    cumulative      DOUBLEPRECISION,
+    cumpercent      DOUBLEPRECISION,
+    ticketnumber    DOUBLEPRECISION,
+);
