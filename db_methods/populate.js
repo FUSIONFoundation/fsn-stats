@@ -174,8 +174,6 @@ class Populate  {
                     return;
                 }
                 else {
-                    var datenow = record[1].toISOString()
-                    
                     const query = 
                          `UPDATE nodes SET info  = ${record[1]} WHERE id = '${record[0]}'`;
                     //console.log(query);
