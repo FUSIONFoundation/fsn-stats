@@ -45,7 +45,7 @@ var connect = function(){
             console.log(`Init. => ${myData.data[0]}`);
             record = [
                 myData.data[0].id,
-                myData.data[0]
+                JSON.stringify(myData.data[0])
             ]
             pop.initUpdateDb(record)
             .then( res => {
