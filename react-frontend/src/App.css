@@ -24,3 +24,8 @@
 .recharts-wrapper {
   margin : 0 auto;
 }
+
+
+.progress-bar{
+  background-color:#34958e !important;
+}

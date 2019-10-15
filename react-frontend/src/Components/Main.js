@@ -7,6 +7,7 @@ import {
     Badge,
     Button,
     Nav,
+    ProgressBar,
     Navbar,
     NavbarBrand,
     NavDropdown,
@@ -14,11 +15,24 @@ import {
     Form,
     FormControl
 } from 'react-bootstrap'
+import Fade from 'react-reveal/Fade';
 import CountUp from 'react-countup';
 import Skeleton, {SkeletonTheme} from 'react-loading-skeleton';
 import TimeAgo from 'react-timeago'
 import Spinner from './Spinner';
-import {BarChart, ComposedChart, ResponsiveContainer, Line, Bar, Tooltip, YAxis, Legend, XAxis, CartesianGrid} from 'recharts';
+import {
+    BarChart,
+    ComposedChart,
+    ChartTooltip,
+    ResponsiveContainer,
+    Line,
+    Bar,
+    Tooltip,
+    YAxis,
+    Legend,
+    XAxis,
+    CartesianGrid
+} from 'recharts';
 import FontAwesome from 'react-loading-skeleton';
 import * as Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -152,6 +166,33 @@ class Main extends React.Component {
     }
 
     render() {
+
+        let pinnedNodes = JSON.parse(localStorage.getItem('pinnedNodes'));
+        const setPinnedNode = (nodename) => {
+            let data = JSON.parse(localStorage.getItem('pinnedNodes'));
+            let u = [];
+            if (!Array.isArray(data)) {
+                u.push(nodename);
+                localStorage.setItem('pinnedNodes', JSON.stringify(u));
+            } else {
+                let data = JSON.parse(localStorage.getItem('pinnedNodes'));
+                data.push(nodename);
+                localStorage.setItem('pinnedNodes', JSON.stringify(data));
+            }
+            console.log(localStorage.getItem('pinnedNodes'))
+        }
+
+        const latencyClass = (latency) =>{
+            if(latency > 100){
+                return 'text-danger';
+            }
+            if(latency > 70){
+                return 'text-warning';
+            } else {
+                return 'text-success'
+            }
+        }
+
         const RoundedBar = (props) => {
             const {fill, x, y, height} = props;
 
@@ -281,14 +322,14 @@ class Main extends React.Component {
                             <tbody className={'text-center'}>
                             {
                                 this.state.nodeIdentifiers.map(((key, index) =>
-                                        <tr>
-                                            <td><a href="#" className="btn btn-sm btn-rounded-circle btn-white">
+                                    <tr className='animated fadeIn'>
+                                            <td><a onClick={function(){setPinnedNode(this.state.nodesList[index].id)}.bind(this)} className="btn btn-sm btn-rounded-circle btn-white">
                                                 +
                                             </a></td>
-                                            <td className={'goal-project'}>{this.state.nodesList[index].active ?
+                                            <td>{this.state.nodesList[index].active ?
                                                 <span className="text-success">●</span> :
                                                 <span className="text-danger">●</span>}</td>
-                                            <td className={'id'}>{this.state.nodesList[index].id}</td>
+                                            <td>{this.state.nodesList[index].id}</td>
                                             <td>{this.state.nodesList[index].height ||
                                             <Spinner/>} {this.state.nodesList[index].hash}</td>
                                             <td>{this.state.nodesList[index].blockLastUpdated ?
@@ -304,18 +345,18 @@ class Main extends React.Component {
                                             <td>{this.state.nodesList[index].peers}</td>
                                             <td className={'recharts-wrapper'}>
                                                 {!this.state.nodesList[index].propagationChart ? <Spinner/> :
-                                                        <BarChart width={200} height={15}
-                                                                  data={this.state.nodesList[index].propagationChart}
-                                                                  margin={{top: 0, right: 0, left: 0, bottom: 0}}
-                                                                  className="pointer">
-                                                            <Bar dataKey="id" minPointSize={3}
-                                                                 isAnimationActive={true}
-                                                                 fill={'#34958e'} shape={<RoundedBar/>}/>}
-                                                        </BarChart>
+                                                    <BarChart width={200} height={15}
+                                                              data={this.state.nodesList[index].propagationChart}
+                                                              margin={{top: 0, right: 0, left: 0, bottom: 0}}
+                                                              className="pointer">
+                                                        <Bar dataKey="id" minPointSize={3}
+                                                             isAnimationActive={true}
+                                                             fill={'#34958e'} shape={<RoundedBar/>}/>}
+                                                    </BarChart>
                                                 }
                                             </td>
-                                            <td>{this.state.nodesList[index].uptime}%</td>
-                                            <td>{this.state.nodesList[index].latency}
+                                            <td><ProgressBar now={this.state.nodesList[index].uptime} label={`${this.state.nodesList[index].uptime}%`} /></td>
+                                            <td className={latencyClass(this.state.nodesList[index].latency)}>{this.state.nodesList[index].latency}
                                                 <small>ms</small>
                                             </td>
                                         </tr>
