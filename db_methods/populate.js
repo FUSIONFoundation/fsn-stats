@@ -145,14 +145,7 @@ class Populate  {
                     client.query(query)
                         .then(res => {
                             //console.log('Overwriting old block database');
-                        })
-                        .catch(err => {
-                             client.release();
-                             console.error(`Query DELETE blocks: Postgres failed`);
-                             reject(err);
-                        });
-                        
-                        query = {
+                            query = {
                                 text: `INSERT INTO ${block_text}`,
                                 values: record
                             }
@@ -170,6 +163,14 @@ class Populate  {
                                 reject(err);
                                 return;
                             });
+                        })
+                        .catch(err => {
+                             client.release();
+                             console.error(`Query DELETE blocks: Postgres failed`);
+                             reject(err);
+                        });
+                        
+                            
                 }
             });
         });
@@ -189,6 +190,26 @@ class Populate  {
                     client.query(query)
                     .then(res => {
                         //console.log('Overwriting old block database');
+                        let chart_text ='charts(utctime, charts) VALUES($1, $2)';
+                        
+                        query = {
+                            text: `INSERT INTO ${chart_text}`,
+                            values: record
+                        }
+                        console.log(`Inserting charts...`);
+                        client.query(query)
+                        .then(res => {
+                            console.log(`Inserted`);
+                            client.release();
+                            resolve(1);
+                            return;
+                        })
+                        .catch(err => {
+                            client.release();
+                            console.error(`Query INSERT INTO charts: Postgres failed`);
+                            reject(err);
+                            return;
+                        });
                     })
                     .catch(err => {
                         client.release();
@@ -196,26 +217,7 @@ class Populate  {
                         reject(err);
                     })
                         
-                    let chart_text ='charts(utctime, charts) VALUES($1, $2)';
-                        
-                    query = {
-                                text: `INSERT INTO ${chart_text}`,
-                                values: record
-                            }
-                            console.log(`Inserting charts...`);
-                            client.query(query)
-                            .then(res => {
-                                console.log(`Inserted`);
-                                client.release();
-                                resolve(1);
-                                return;
-                            })
-                            .catch(err => {
-                                client.release();
-                                console.error(`Query INSERT INTO charts: Postgres failed`);
-                                reject(err);
-                                return;
-                            });
+                            
                         
                 }
                 
