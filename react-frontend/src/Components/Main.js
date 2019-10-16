@@ -17,6 +17,7 @@ import {
 } from 'react-bootstrap'
 import Fade from 'react-reveal/Fade';
 import axios from 'axios';
+import ReactCountryFlag from "react-country-flag";
 import CountUp from 'react-countup';
 import Skeleton, {SkeletonTheme} from 'react-loading-skeleton';
 import TimeAgo from 'react-timeago'
@@ -48,19 +49,34 @@ class Main extends React.Component {
         let allNodes = [];
         let identifiers = [];
 
-//         axios.get('http://93.89.252.58:3002/nodes').then(function(data){
-// console.log(data);
-//         });
+        axios.get('http://93.89.252.58:3002/nodes').then(function (data) {
+            console.log(data);
+        });
+
+        axios.get('http://93.89.252.58:3002/blocks').then(function (data) {
+            console.log(data);
+        });
+
+        axios.get('http://93.89.252.58:3002/info').then(function (data) {
+            console.log(data);
+        });
+
+        axios.get('http://93.89.252.58:3002/charts').then(function (data) {
+            console.log(data);
+        });
+
 
         const keepAlive = () => {
             let client = new W3CWebSocket('wss://node.fusionnetwork.io/primus');
-
+            let highestBlock = 0;
+            let lastUpdatedBlock = 0;
             client.onmessage = (data) => {
                 let action = JSON.parse(data.data).action;
                 // console.log(action);
                 if (action === 'charts') {
                     let chartData = JSON.parse(data.data).data;
-                    let highestBlock = Math.max(...chartData.height);
+                    // console.log(chartData);
+                    // let highestBlock = Math.max(...chartData.height);
                     let heightChart = chartData.height;
                     let avgBlockTime = chartData.avgBlocktime.toString().substr(0, 5);
                     let difficulty = Math.max(...chartData.difficulty);
@@ -75,7 +91,6 @@ class Main extends React.Component {
                     }
 
                     this.setState({
-                        highestBlock: highestBlock,
                         chartData: heightChart,
                         avgBlockTime: avgBlockTime,
                         difficulty: difficulty,
@@ -86,9 +101,11 @@ class Main extends React.Component {
                 if (action === 'stats') {
                     let id = JSON.parse(data.data).data.id;
                     let stats = JSON.parse(data.data).data.stats;
+                    let info = JSON.parse(data.data).data.info;
                     stats.id = id;
+                    stats.info = info;
 
-                    // if (allNodes.length > 5) return;
+                    // if (allNodes.length > 10) return;
 
                     let objIndex = allNodes.findIndex((value => value.id === id));
                     if (objIndex === -1) {
@@ -105,11 +122,12 @@ class Main extends React.Component {
                         nodesList: allNodes
                     });
                 }
+
                 if (action === 'block') {
                     let blockData = JSON.parse(data.data).data;
+                    // console.log(blockData);
                     let objIndex = allNodes.findIndex((value => value.id === blockData.id));
                     if (objIndex === -1) {
-
                     } else {
                         let propagationChart = [];
                         for (let i in blockData.history) {
@@ -119,13 +137,20 @@ class Main extends React.Component {
                             };
                         }
 
+                        if (blockData.block.number > highestBlock) {
+                            highestBlock = blockData.block.number;
+                            lastUpdatedBlock = new Date().getTime();
+                        }
+
                         allNodes[objIndex].height = blockData.block.number;
                         allNodes[objIndex].propagationChart = propagationChart;
                         allNodes[objIndex].hash = formatHash(blockData.block.hash);
                         allNodes[objIndex].blockLastUpdated = (blockData.block.timestamp * 1000);
-                        console.log(allNodes);
+                        // console.log(allNodes);
                         this.setState({
-                            nodesList: allNodes
+                            nodesList: allNodes,
+                            highestBlock: highestBlock,
+                            lastUpdatedBlock: lastUpdatedBlock
                         })
                         this.forceUpdate()
                     }
@@ -167,7 +192,8 @@ class Main extends React.Component {
         nodesList: [],
         nodeIdentifiers: [],
         totalNodes: undefined,
-        avgBlockTimeChart: []
+        avgBlockTimeChart: [],
+        lastUpdatedBlock: 0
     }
 
     render() {
@@ -187,15 +213,14 @@ class Main extends React.Component {
             console.log(localStorage.getItem('pinnedNodes'))
         }
 
-        const latencyClass = (latency) =>{
-            if(latency > 100){
-                return 'text-danger';
-            }
-            if(latency > 70){
-                return 'text-warning';
-            } else {
-                return 'text-success'
-            }
+        const blockClass = (nodeBlock, highestBlock) => {
+            if (highestBlock && nodeBlock) {
+                if ((highestBlock - nodeBlock) === 1) {
+                    return 'text-warn';
+                } else if ((highestBlock - nodeBlock) > 1) {
+                    return 'text-danger';
+                }
+            };
         }
 
         const RoundedBar = (props) => {
@@ -233,7 +258,7 @@ class Main extends React.Component {
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    {this.state.highestBlock}
+                                    <TimeAgo date={this.state.lastUpdatedBlock}/>
                                 </div>
                             </div>
                         </Col>
@@ -252,7 +277,6 @@ class Main extends React.Component {
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    {this.state.highestBlock}
                                 </div>
                             </div>
                         </Col>
@@ -313,6 +337,7 @@ class Main extends React.Component {
                                     data-original-title="Tooltip on top">Active
                                 </th>
                                 <th>ID</th>
+                                <th>Type</th>
                                 <th>Height</th>
                                 <th>Block Time</th>
                                 <th>Tickets</th>
@@ -321,22 +346,24 @@ class Main extends React.Component {
                                 <th>Peers</th>
                                 <th>Propagation</th>
                                 <th>Uptime</th>
-                                <th>Latency</th>
                             </tr>
                             </thead>
                             <tbody className={'text-center'}>
                             {
                                 this.state.nodeIdentifiers.map(((key, index) =>
-                                    <tr className='animated fadeIn'>
-                                            <td><a onClick={function(){setPinnedNode(this.state.nodesList[index].id)}.bind(this)} className="btn btn-sm btn-rounded-circle btn-white">
+                                        <tr className='animated fadeIn'>
+                                            <td><a onClick={function () {
+                                                setPinnedNode(this.state.nodesList[index].id)
+                                            }.bind(this)} className="btn btn-sm btn-rounded-circle btn-white">
                                                 +
                                             </a></td>
                                             <td>{this.state.nodesList[index].active ?
                                                 <span className="text-success">●</span> :
                                                 <span className="text-danger">●</span>}</td>
                                             <td>{this.state.nodesList[index].id}</td>
-                                            <td>{this.state.nodesList[index].height ||
-                                            <Spinner/>} {this.state.nodesList[index].hash}</td>
+                                            <td>{this.state.nodesList[index].info.node}</td>
+                                            <td className={blockClass(this.state.nodesList[index].height, this.state.highestBlock)}>{this.state.nodesList[index].height ||
+                                            <Spinner/>} <span className={'pl-4'}>{this.state.nodesList[index].hash}</span></td>
                                             <td>{this.state.nodesList[index].blockLastUpdated ?
                                                 <TimeAgo date={this.state.nodesList[index].blockLastUpdated}/> :
                                                 <Spinner/>}</td>
@@ -360,10 +387,8 @@ class Main extends React.Component {
                                                     </BarChart>
                                                 }
                                             </td>
-                                            <td><ProgressBar now={this.state.nodesList[index].uptime} label={`${this.state.nodesList[index].uptime}%`} /></td>
-                                            <td className={latencyClass(this.state.nodesList[index].latency)}>{this.state.nodesList[index].latency}
-                                                <small>ms</small>
-                                            </td>
+                                            <td><ProgressBar now={this.state.nodesList[index].uptime}
+                                                             label={`${this.state.nodesList[index].uptime}%`}/></td>
                                         </tr>
                                 ))
                             }

@@ -8,6 +8,7 @@
     "highcharts-react-official": "^2.2.2",
     "react": "^16.10.2",
     "react-bootstrap": "^1.0.0-beta.14",
+    "react-country-flag": "^1.1.0",
     "react-countup": "^4.2.2",
     "react-dom": "^16.10.2",
     "react-fontawesome": "^1.6.1",
