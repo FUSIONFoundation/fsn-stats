@@ -19,8 +19,10 @@ import Fade from 'react-reveal/Fade';
 import axios from 'axios';
 import ReactCountryFlag from "react-country-flag";
 import CountUp from 'react-countup';
+import Countdown from 'react-countdown-now';
 import Skeleton, {SkeletonTheme} from 'react-loading-skeleton';
-import TimeAgo from 'react-timeago'
+import TimeAgo from 'react-timeago';
+import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
 import Spinner from './Spinner';
 import {
     BarChart,
@@ -72,14 +74,15 @@ class Main extends React.Component {
         // });
 
         axios.get('http://93.89.252.58:3002/charts').then(function (data) {
-            console.log(data);
+            processCharts(data);
         });
 
 
         let highestBlock = 0;
         let lastUpdatedBlock = 0;
         const processCharts = (data) => {
-            let chartData = JSON.parse(data.data).data;
+            console.log(data);
+            let chartData = JSON.parse(data.data[0].charts);
             // let highestBlock = Math.max(...chartData.height);
             let heightChart = chartData.height;
             let avgBlockTime = chartData.avgBlocktime.toString().substr(0, 5);
@@ -166,11 +169,12 @@ class Main extends React.Component {
                         nodesList: allNodes,
                         highestBlock: highestBlock,
                         lastUpdatedBlock: lastUpdatedBlock,
-                        ticketNumber: data.ticketNumber
+                        ticketNumber: data.ticketNumber,
+                        lastUpdatedData: Date.now() + 5000
                     })
 
                     allNodes = [];
-                    setTimeout(function(){getData()},7500)
+                    setTimeout(function(){getData()},5000)
                 }
             }
         }
@@ -321,12 +325,15 @@ class Main extends React.Component {
                             </div>
                         </Col>
                     </Row>
-                    <Col md={12}>
-                        <div className={'float-right'}>
-                            <th className="text-muted">Updating In:</th>
+                    <Col md={12} className={'text-stats'}>
+                        <div className={'float-md-left'}>
+                            <span className={'mr-2'}>Active Nodes</span> {this.state.totalNodes ? <span className={'nodes-badge p-1'}>{this.state.totalNodes}</span> : <Spinner/>}
+                        </div>
+                        <div className={'float-md-right'}>
+                           Updating In: <TimeAgo date={this.state.lastUpdatedData}/>
                         </div>
                     </Col>
-                    <Col className={'table-responsive'} md={12}>
+                    <Col className={'table-responsive pt-3'} md={12}>
                         <Table className={'table table-sm table-nowrap card-table'} borderless variant="">
                             <thead className={'text-center text-muted'}>
                             <tr>

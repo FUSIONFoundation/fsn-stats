@@ -33,3 +33,22 @@
 .text-warn{
   color:#EFC865;
 }
+
+.nodes-badge{
+  border: 1px solid #41526A;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: .08em;
+  font-size:12px;
+  color: #6e84a3;
+}
+.text-stats{
+  background-color: #12263f;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: .08em;
+  color: #6e84a3;
+  border-bottom-width: 1px;
+  font-size: .625rem;
+}
