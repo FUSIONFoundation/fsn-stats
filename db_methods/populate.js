@@ -77,6 +77,42 @@ class Populate  {
         });
     }
     
+    nodeUpdateDb(record) {
+        return new Promise(function(resolve, reject) {
+            db.getClient((err,client,done) => {
+                if (err) {
+                    console.log(err.stack);
+                    console.error('Could not connect to postgres', err);
+                    reject(err);
+                    return;
+                }
+                else {
+                    record[1] = record[1].replace('T',' ');
+                    record[1] = record[1].replace('Z','');
+                    record[1] = record[1].replace('.0','+');
+                    //console.log(record[1]);
+                    const query = 
+                         `UPDATE nodes SET utctime     = '${record[1]}', block = ${record[2]}, stats = '${record[3]}', info = '${record[4]}' WHERE id = '${record[0]}'`;
+                    //console.log(query);
+                    client.query(query)
+                        .then(res => {
+                            client.release();
+                            resolve(1);
+                            return;
+                        })
+                        .catch(err => {
+                             client.release();
+                             console.error(`Query UPDATE node: Postgres failed`);
+                             reject(err);
+                             return;
+                        });
+                }
+            });
+        });
+    }
+    
+    
+    
     
       
     nodeDeleteDb(id) {

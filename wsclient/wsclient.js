@@ -18,7 +18,9 @@ var connect = function(){
     let timerId = 0;
     let blockNo = -1;
     let timestamp = 0;
-    let utctime;
+    let epoch0time = new Date(0);
+    utctime = epoch0time.toISOString();
+
 
     wsclient.onopen = () => {
         console.log(new Date(), ` WebSocket Client Connected`);
@@ -86,7 +88,17 @@ var connect = function(){
 
             
             //await pop.nodeDeleteDb(recordStats[0])
-            //.then((res) => {
+            pop.nodeUpdateDb(recordStats)
+            .then((res) => {
+                
+            })
+            .catch( err => {
+                if (err.detail == 'undefined') {
+                    console.log(`Node has not yet been defined, posting it...`);
+                }
+                else {
+                    console.error(err.stack);
+                }
                 pop.nodePostDb(recordStats)
                 .then( res => {
                     if (res == 1) {
@@ -101,11 +113,7 @@ var connect = function(){
                     console.log(err.detail);
                     return;
                 })
-            /*})
-            .catch( err => {
-                console.log(err.stack);
-                    return;
-            })*/
+            })
 
         }    // End of currentAction === 'stats'
 
