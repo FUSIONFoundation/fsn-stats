@@ -59,7 +59,7 @@ var connect = function(){
                 utctime,
                 blockdata
             ]
-            pop.blockPostDb(recordBlock)
+            /*pop.blockPostDb(recordBlock)
             .then( res => {
                 if (res == 0) {
                     console.log(`Block data write finished`);
@@ -67,7 +67,7 @@ var connect = function(){
             })
             .catch( err => {
                 console.log(err.stack);
-            })
+            })*/
 
         }  // End of currentAction === 'blocks'
 
@@ -84,8 +84,9 @@ var connect = function(){
             ];
             //console.log(recordStats);
 
-            await pop.nodeDeleteDb(recordStats[0])
-            .then((res) => {
+            
+            //await pop.nodeDeleteDb(recordStats[0])
+            //.then((res) => {
                 pop.nodePostDb(recordStats)
                 .then( res => {
                     if (res == 1) {
@@ -96,14 +97,15 @@ var connect = function(){
                     }
                 })
                 .catch( err => {
-                    console.log(err.stack);
+                    //console.log(err.stack);
+                    console.log(err.detail);
                     return;
                 })
-            })
+            /*})
             .catch( err => {
                 console.log(err.stack);
                     return;
-            })
+            })*/
 
         }    // End of currentAction === 'stats'
 
