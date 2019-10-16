@@ -49,140 +49,140 @@ class Main extends React.Component {
         let allNodes = [];
         let identifiers = [];
 
-        axios.get('http://93.89.252.58:3002/nodes').then(function (data) {
-            console.log(data);
-        });
+        let totalNodes = undefined;
+        const getData = () => {
+                console.log('Retrieving data')
+                axios.get('http://93.89.252.58:3002/nodes').then(async function (data) {
+                    totalNodes = data.data.length;
+                    let nodeData = data.data;
+                    for (let node in nodeData) {
+                        processStats(nodeData[node]);
+                    }
+                });
+        }
 
-        axios.get('http://93.89.252.58:3002/blocks').then(function (data) {
-            console.log(data);
-        });
+        getData();
 
-        axios.get('http://93.89.252.58:3002/info').then(function (data) {
-            console.log(data);
-        });
+        // axios.get('http://93.89.252.58:3002/blocks').then(function (data) {
+        //     console.log(data);
+        // });
+
+        // axios.get('http://93.89.252.58:3002/info').then(function (data) {
+        //     console.log(data);
+        // });
 
         axios.get('http://93.89.252.58:3002/charts').then(function (data) {
             console.log(data);
         });
 
 
-        const keepAlive = () => {
-            let client = new W3CWebSocket('wss://node.fusionnetwork.io/primus');
-            let highestBlock = 0;
-            let lastUpdatedBlock = 0;
-            client.onmessage = (data) => {
-                let action = JSON.parse(data.data).action;
-                // console.log(action);
-                if (action === 'charts') {
-                    let chartData = JSON.parse(data.data).data;
-                    // console.log(chartData);
-                    // let highestBlock = Math.max(...chartData.height);
-                    let heightChart = chartData.height;
-                    let avgBlockTime = chartData.avgBlocktime.toString().substr(0, 5);
-                    let difficulty = Math.max(...chartData.difficulty);
+        let highestBlock = 0;
+        let lastUpdatedBlock = 0;
+        const processCharts = (data) => {
+            let chartData = JSON.parse(data.data).data;
+            // let highestBlock = Math.max(...chartData.height);
+            let heightChart = chartData.height;
+            let avgBlockTime = chartData.avgBlocktime.toString().substr(0, 5);
+            let difficulty = Math.max(...chartData.difficulty);
 
-                    let blocksChart = [];
+            let blocksChart = [];
 
-                    for (let i in chartData.blocktime) {
-                        blocksChart[i] = {
-                            "blocktime": chartData.blocktime[i],
-                            "height": chartData.height[i]
-                        };
-                    }
-
-                    this.setState({
-                        chartData: heightChart,
-                        avgBlockTime: avgBlockTime,
-                        difficulty: difficulty,
-                        avgBlockTimeChart: blocksChart
-                    });
-                }
-
-                if (action === 'stats') {
-                    let id = JSON.parse(data.data).data.id;
-                    let stats = JSON.parse(data.data).data.stats;
-                    let info = JSON.parse(data.data).data.info;
-                    stats.id = id;
-                    stats.info = info;
-
-                    // if (allNodes.length > 10) return;
-
-                    let objIndex = allNodes.findIndex((value => value.id === id));
-                    if (objIndex === -1) {
-                        allNodes.push(stats);
-                        objIndex = allNodes.findIndex((value => value.id === id));
-                        identifiers[objIndex] = id;
-                    } else {
-                        objIndex = allNodes.findIndex((value => value.id === id));
-                        identifiers[objIndex] = id;
-                    }
-                    this.setState({
-                        totalNodes: Object.keys(allNodes).length,
-                        nodeIdentifiers: identifiers,
-                        nodesList: allNodes
-                    });
-                }
-
-                if (action === 'block') {
-                    let blockData = JSON.parse(data.data).data;
-                    // console.log(blockData);
-                    let objIndex = allNodes.findIndex((value => value.id === blockData.id));
-                    if (objIndex === -1) {
-                    } else {
-                        let propagationChart = [];
-                        for (let i in blockData.history) {
-                            propagationChart[i] = {
-                                "id": i,
-                                "value": blockData.history[i]
-                            };
-                        }
-
-                        if (blockData.block.number > highestBlock) {
-                            highestBlock = blockData.block.number;
-                            lastUpdatedBlock = new Date().getTime();
-                        }
-
-                        allNodes[objIndex].height = blockData.block.number;
-                        allNodes[objIndex].propagationChart = propagationChart;
-                        allNodes[objIndex].hash = formatHash(blockData.block.hash);
-                        allNodes[objIndex].blockLastUpdated = (blockData.block.timestamp * 1000);
-                        // console.log(allNodes);
-                        this.setState({
-                            nodesList: allNodes,
-                            highestBlock: highestBlock,
-                            lastUpdatedBlock: lastUpdatedBlock
-                        })
-                        this.forceUpdate()
-                    }
-                }
-                if (action === 'update') {
-                    let info = JSON.parse(data.data);
-                    console.log(info);
-                }
-                if (action === 'init') {
-
-                }
-                if (action === 'info') {
-                    let info = JSON.parse(data.data);
-                    console.log(info);
-                }
+            for (let i in chartData.blocktime) {
+                blocksChart[i] = {
+                    "blocktime": chartData.blocktime[i],
+                    "height": chartData.height[i]
+                };
             }
 
-            client.onclose = () => {
-                console.log('closed...');
-                keepAlive();
+            this.setState({
+                chartData: heightChart,
+                avgBlockTime: avgBlockTime,
+                difficulty: difficulty,
+                avgBlockTimeChart: blocksChart
+            });
+        }
+
+
+        const processStats = async (data) => {
+            let id = data.id;
+            let stats = JSON.parse(data.stats);
+            let info = stats.info;
+            let geo = stats.geo;
+            stats.id = id;
+            stats.info = info;
+            stats.geo = geo;
+
+            // Make hash smaller
+            stats.stats.block.hash = formatHash(stats.stats.block.hash);
+
+            let objIndex = allNodes.findIndex((value => value.id === id));
+            if (objIndex === -1) {
+                allNodes.push(stats);
+                objIndex = allNodes.findIndex((value => value.id === id));
+                identifiers[objIndex] = id;
+            } else {
+                objIndex = allNodes.findIndex((value => value.id === id));
+                identifiers[objIndex] = id;
             }
 
-            const formatHash = (hash) => {
-                let a = hash.length;
-                let b = hash.substr(0, 4);
-                let c = b + ' ... ' + hash.substr(a - 4, a);
-                return c;
+
+            if (Object.keys(allNodes).length === totalNodes) {
+                this.setState({
+                    totalNodes: Object.keys(allNodes).length,
+                    nodeIdentifiers: identifiers,
+                    nodesList: allNodes
+                });
+            }
+
+            await processBlocks(stats.stats.block, id);
+        }
+
+        const processBlocks = async (data, id) => {
+            data.id = id;
+            let objIndex = allNodes.findIndex((value => value.id === data.id));
+            if (objIndex === -1) {
+            } else {
+                let propagationChart = [];
+                for (let i in data.history) {
+                    propagationChart[i] = {
+                        "id": i,
+                        "value": data.history[i]
+                    };
+                }
+
+                if (data.number > highestBlock) {
+                    highestBlock = data.number;
+                    lastUpdatedBlock = new Date().getTime();
+                }
+
+
+                allNodes[objIndex].height = data.number;
+                allNodes[objIndex].propagationChart = propagationChart;
+                allNodes[objIndex].hash = formatHash(data.hash);
+                allNodes[objIndex].blockLastUpdated = (data.timestamp * 1000);
+
+                if (Object.keys(allNodes).length === totalNodes) {
+                    this.setState({
+                        nodesList: allNodes,
+                        highestBlock: highestBlock,
+                        lastUpdatedBlock: lastUpdatedBlock,
+                        ticketNumber: data.ticketNumber
+                    })
+
+                    allNodes = [];
+                    setTimeout(function(){getData()},7500)
+                }
             }
         }
 
-        keepAlive();
+        const formatHash = (hash) => {
+            let a = hash.length;
+            let b = hash.substr(0, 4);
+            let c = b + ' ... ' + hash.substr(a - 4, a);
+            return c;
+        }
     }
+
 
     state = {
         highestBlock: undefined,
@@ -220,7 +220,8 @@ class Main extends React.Component {
                 } else if ((highestBlock - nodeBlock) > 1) {
                     return 'text-danger';
                 }
-            };
+            }
+            ;
         }
 
         const RoundedBar = (props) => {
@@ -243,91 +244,88 @@ class Main extends React.Component {
                                 Work in progress!
                             </div>
                         </Col>
-                        <Col md={3}>
+                        <Col md={2}>
                             <div className="card">
-                                <div className="card-header">
+                                <div className="card-body">
                                     <div className="row align-items-center">
                                         <div className="col">
-                                            <h4 className="card-header-title">
-                                                Blocks
-                                            </h4>
+                                            <h6 className="card-title text-uppercase text-muted mb-2">
+                                                Last Block
+                                            </h6>
+                                            <span className="h2 mb-0">
+                                                {this.state.highestBlock || <Spinner/>}
+                                            </span>
                                         </div>
                                         <div className="col-auto">
-                                            {this.state.highestBlock || <Spinner/>}
+                                            <span className="h2 fe fe-briefcase text-muted mb-0"></span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="card-body">
-                                    <TimeAgo date={this.state.lastUpdatedBlock}/>
-                                </div>
                             </div>
                         </Col>
-                        <Col md={3}>
+                        <Col md={2}>
                             <div className="card">
-                                <div className="card-header">
+                                <div className="card-body">
                                     <div className="row align-items-center">
                                         <div className="col">
-                                            <h4 className="card-header-title">
-                                                Blocks
-                                            </h4>
+                                            <h6 className="card-title text-uppercase text-muted mb-2">
+                                                Block Time Ago
+                                            </h6>
+                                            <span className="h2 mb-0">
+                                                {this.state.lastUpdatedBlock ? <TimeAgo date={this.state.lastUpdatedBlock}/> : <Spinner/>}
+                                            </span>
                                         </div>
                                         <div className="col-auto">
-                                            {this.state.highestBlock || <Spinner/>}
+                                            <span className="h2 fe fe-briefcase text-muted mb-0"></span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="card-body">
-                                </div>
                             </div>
                         </Col>
-                        <Col md={3}>
+                        <Col md={2}>
                             <div className="card">
-                                <div className="card-header">
+                                <div className="card-body">
                                     <div className="row align-items-center">
                                         <div className="col">
-                                            <h4 className="card-header-title">
+                                            <h6 className="card-title text-uppercase text-muted mb-2">
                                                 Average Block Time
-                                            </h4>
+                                            </h6>
+                                            <span className="h2 mb-0">
+                                                {this.state.avgBlockTime || <Spinner/>}
+                                            </span>
                                         </div>
                                         <div className="col-auto">
-                                            {this.state.avgBlockTime ||
-                                            <div className="spinner-border spinner-border-sm" role="status">
-                                                <span className="sr-only">Loading...</span>
-                                            </div>}
+                                            <span className="h2 fe fe-briefcase text-muted mb-0"></span>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="card-body">
-                                    <BarChart width={400} height={75}
-                                              data={this.state.avgBlockTimeChart}
-                                              margin={{top: 0, right: 0, left: 0, bottom: 0}}
-                                              className="pointer">
-                                        <Bar dataKey="blocktime" minPointSize={3}
-                                             isAnimationActive={true}
-                                             fill={'#34958e'} shape={<RoundedBar/>}/>}
-                                    </BarChart>
                                 </div>
                             </div>
                         </Col>
-                        <Col md={3}>
+                        <Col md={2}>
                             <div className="card">
-                                <div className="card-header">
+                                <div className="card-body">
                                     <div className="row align-items-center">
                                         <div className="col">
-                                            <h4 className="card-header-title">
-                                                Difficulty
-                                            </h4>
+                                            <h6 className="card-title text-uppercase text-muted mb-2">
+                                                Tickets
+                                            </h6>
+                                            <span className="h2 mb-0">
+                                                {this.state.ticketNumber || <Spinner/>}
+                                            </span>
                                         </div>
                                         <div className="col-auto">
-                                            {this.state.difficulty || <Spinner/>}
+                                            <span className="h2 fe fe-briefcase text-muted mb-0"></span>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="card-body">
                                 </div>
                             </div>
                         </Col>
                     </Row>
+                    <Col md={12}>
+                        <div className={'float-right'}>
+                            <th className="text-muted">Updating In:</th>
+                        </div>
+                    </Col>
                     <Col className={'table-responsive'} md={12}>
                         <Table className={'table table-sm table-nowrap card-table'} borderless variant="">
                             <thead className={'text-center text-muted'}>
@@ -336,6 +334,7 @@ class Main extends React.Component {
                                 <th data-toggle="tooltip" data-placement="top" title=""
                                     data-original-title="Tooltip on top">Active
                                 </th>
+                                <th>Location</th>
                                 <th>ID</th>
                                 <th>Type</th>
                                 <th>Height</th>
@@ -344,8 +343,8 @@ class Main extends React.Component {
                                 <th>Mining</th>
                                 <th>Syncing</th>
                                 <th>Peers</th>
-                                <th>Propagation</th>
                                 <th>Uptime</th>
+                                <th>Latency</th>
                             </tr>
                             </thead>
                             <tbody className={'text-center'}>
@@ -357,38 +356,33 @@ class Main extends React.Component {
                                             }.bind(this)} className="btn btn-sm btn-rounded-circle btn-white">
                                                 +
                                             </a></td>
-                                            <td>{this.state.nodesList[index].active ?
+                                            <td>{this.state.nodesList[index].stats.active ?
                                                 <span className="text-success">●</span> :
                                                 <span className="text-danger">●</span>}</td>
+                                            <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
+                                                code={this.state.nodesList[index].geo.country.toLowerCase()}
+                                                svg/> : '?'}</td>
                                             <td>{this.state.nodesList[index].id}</td>
                                             <td>{this.state.nodesList[index].info.node}</td>
-                                            <td className={blockClass(this.state.nodesList[index].height, this.state.highestBlock)}>{this.state.nodesList[index].height ||
-                                            <Spinner/>} <span className={'pl-4'}>{this.state.nodesList[index].hash}</span></td>
-                                            <td>{this.state.nodesList[index].blockLastUpdated ?
-                                                <TimeAgo date={this.state.nodesList[index].blockLastUpdated}/> :
-                                                <Spinner/>}</td>
-                                            <td>{this.state.nodesList[index].myTicketNumber}</td>
-                                            <td>{this.state.nodesList[index].mining ?
-                                                <span className="text-success">●</span> :
-                                                <span className="text-danger">●</span>}</td>
-                                            <td>{this.state.nodesList[index].syncing ?
-                                                <span className="text-success">●</span> :
-                                                <span className="text-danger">●</span>}</td>
-                                            <td>{this.state.nodesList[index].peers}</td>
-                                            <td className={'recharts-wrapper'}>
-                                                {!this.state.nodesList[index].propagationChart ? <Spinner/> :
-                                                    <BarChart width={200} height={15}
-                                                              data={this.state.nodesList[index].propagationChart}
-                                                              margin={{top: 0, right: 0, left: 0, bottom: 0}}
-                                                              className="pointer">
-                                                        <Bar dataKey="id" minPointSize={3}
-                                                             isAnimationActive={true}
-                                                             fill={'#34958e'} shape={<RoundedBar/>}/>}
-                                                    </BarChart>
-                                                }
+                                            <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
+                                            <Spinner/>} <span
+                                                className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
                                             </td>
-                                            <td><ProgressBar now={this.state.nodesList[index].uptime}
-                                                             label={`${this.state.nodesList[index].uptime}%`}/></td>
+                                            <td>{this.state.nodesList[index].stats.block.received ?
+                                                <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
+                                                <Spinner/>}</td>
+                                            <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
+                                            <td>{this.state.nodesList[index].stats.mining ?
+                                                <span className="text-success">●</span> :
+                                                <span className="text-danger">●</span>}</td>
+                                            <td>{this.state.nodesList[index].stats.syncing ?
+                                                <span className="text-success">●</span> :
+                                                <span className="text-danger">●</span>}</td>
+                                            <td>{this.state.nodesList[index].stats.peers}</td>
+                                            <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
+                                                             label={`${this.state.nodesList[index].stats.uptime}%`}/>
+                                            </td>
+                                            <td>{this.state.nodesList[index].stats.latency}ms</td>
                                         </tr>
                                 ))
                             }
