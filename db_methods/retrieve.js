@@ -23,7 +23,7 @@ class Retrieve  {
                     reject(err);
                 }
                 else {
-                    const query = `SELECT id, datetime, block, mining, syncing, peers, uptime, latency, tickets, info FROM nodes`;
+                    const query = `SELECT id, utctime, block, stats, info FROM nodes`;
                     client.query(query)
                         .then(res => {
                             client.release();
@@ -49,7 +49,7 @@ class Retrieve  {
                     reject(err);
                 }
                 else {
-                    const query = `SELECT height, blocktime, difficulty, transactions, gasspending, gaslimit, ticketnumber, unclecount, uncles FROM blocks`;
+                    const query = `SELECT utctime, blocks FROM blocks`;
                     client.query(query)
                         .then(res => {
                             client.release();
@@ -75,7 +75,7 @@ class Retrieve  {
                     reject(err);
                 }
                 else {
-                    const query = `SELECT x, dx, y, frequency, cumulative, cumpercent FROM charts`;
+                    const query = `SELECT utctime, charts FROM charts`;
                     client.query(query)
                         .then(res => {
                             client.release();
@@ -85,32 +85,6 @@ class Retrieve  {
                         .catch(err => {
                              client.release();
                              console.error(`Query SELECT chartsGetAllDb: Postgres failed`);
-                             reject(err);
-                        });
-                }
-            });
-        });
-    }
-    
-    infoGetAllDb() {
-        return new Promise(function(resolve, reject) {
-            db.getClient((err,client,done) => {
-                if (err) {
-                    console.log(err.stack);
-                    console.error('Could not connect to postgres', err);
-                    reject(err);
-                }
-                else {
-                    const query = `SELECT id, info FROM nodes`;
-                    client.query(query)
-                        .then(res => {
-                            client.release();
-                            let json_data = JSON.stringify(res.rows);
-                            resolve(json_data)
-                        })
-                        .catch(err => {
-                             client.release();
-                             console.error(`Query SELECT infoGetAllDb: Postgres failed`);
                              reject(err);
                         });
                 }

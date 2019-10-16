@@ -7,14 +7,18 @@ let WebSocketClient = require('websocket').w3cwebsocket;
 
 var reconnectInterval = 1000 * 10;
 
+let info = null;
+
 var connect = function(){
 
     //const wsclient = new WebSocketClient('ws://127.0.0.1:3000/primus');
     const wsclient = new WebSocketClient('wss://node.fusionnetwork.io/primus');
     
     olderThanHours = 3;    // Remove nodes inactive for olderThanHours hours
-    var timerId = 0;
-    var blockNo = -1;
+    let timerId = 0;
+    let blockNo = -1;
+    let timestamp = 0;
+    let utctime;
 
     wsclient.onopen = () => {
         console.log(new Date(), ` WebSocket Client Connected`);
@@ -36,83 +40,26 @@ var connect = function(){
         let currentAction = myData.action;
         console.log(`Current action is => ${currentAction}`);
         
+                
+        if (currentAction === 'init') {
+            console.log(`Init. => ${myData.data[0]}`);
+            info = JSON.stringify(myData.data[0]);
+        };
+        
         if (myData.data.id && currentAction === 'block') {
             console.log(`Block No. => ${myData.data.block.number}`);
             blockNo = myData.data.block.number;
-        };
-        
-        if (currentAction === 'init') {
-            console.log(`Init. => ${myData.data[0]}`);
-            record = [
-                myData.data[0].id,
-                JSON.stringify(myData.data[0])
-            ]
-            pop.initUpdateDb(record)
-            .then( res => {
-                if (res == 1) {
-                    console.log(`Update init record '${record[0]}'`);
-                }
-                else {
-                    console.log(`Unidentified return from initUpdateDb = ${res}`);
-                }
-            })
-            .catch( err => {
-                console.log(err.stack);
-                return;
-            })
-        };
-        
-        if (myData.data.id && currentAction === 'stats') {
-            console.log(`User ID => ${myData.data.id}`);
-            if (myData.data.stats.myTicketNumber == 'N/A') {
-                myticketno = -1;
-            }
-            else {
-                myticketno = myData.data.stats.myTicketNumber;
-            }
-            record = [
-                myData.data.id,
-                now,
-                blockNo,
-                myData.data.stats.mining,
-                myData.data.stats.syncing,
-                myData.data.stats.peers,
-                myData.data.stats.uptime,
-                parseInt(myData.data.stats.latency),
-                myticketno
-            ];
-            //console.log(record);
+            timestamp = myData.data.block.timestamp;
+            utctime = new Date(timestamp*1000).toISOString();    // UTC
             
-            pop.nodePostDb(record)
-            .then( res => {
-                if (res == 1) {
-                    //console.log(`Posted`);
-                }
-                else {
-                    console.log(`Unidentified return from nodePostDb = ${res}`);
-                }
-            })
-            .catch( err => {
-                console.log(err.stack);
-                return;
-            })
-                
-        }    // End of currentAction === 'stats'
-        
-        else if (currentAction === 'charts') {
+            blockdata = JSON.stringify(myData.data.block);
+            
             //console.log(`Height => ${myData.data.height}`);
-            record = {
-                height:         myData.data.height,
-                blocktime:      myData.data.blocktime,
-                difficulty:     myData.data.difficulty,
-                transactions:   myData.data.transactions,
-                gasSpending:    myData.data.gasSpending,
-                gasLimit:       myData.data.gasLimit,
-                ticketNumber:   myData.data.ticketNumber,
-                uncleCount:     myData.data.uncleCount,
-                uncles:         myData.data.uncles
-            }
-            pop.blockPostDb(record)
+            let recordBlock = [
+                utctime,
+                blockdata
+            ]
+            pop.blockPostDb(recordBlock)
             .then( res => {
                 if (res == 0) {
                     console.log(`Block data write finished`);
@@ -121,41 +68,63 @@ var connect = function(){
             .catch( err => {
                 console.log(err.stack);
             })
+
+        }  // End of currentAction === 'blocks' 
+        
+        
+        if (myData.data.id && currentAction === 'stats') {
+            console.log(`User ID => ${myData.data.id}`);
+            let statdata = JSON.stringify(myData.data);
+            let recordStats = [
+                myData.data.id,
+                utctime,
+                blockNo,
+                statdata,
+                info
+            ];
+            //console.log(recordStats);
             
-                let histogram = myData.data.propagation.histogram; 
-                //console.log(histogram);
-                var x=[];var dx=[];var y=[];var frequency= [];var cumulative=[];var cumpercent=[];
-                for(let i=0;i<histogram.length;i++) {
-                    x.push(histogram[i].x);
-                    dx.push(histogram[i].dx);
-                    y.push(histogram[i].y);
-                    frequency.push(histogram[i].frequency);
-                    cumulative.push(histogram[i].cumulative);
-                    cumpercent.push(histogram[i].cumpercent);
-                }
-                
-                record = {
-                    x:              x,
-                    dx:             dx,
-                    y:              y,
-                    frequency:      frequency,
-                    cumulative:     cumulative,
-                    cumpercent:     cumpercent
-                }
-                //console.log(record);
-                pop.chartPostDb(record)
+            pop.nodeDeleteDb(recordStats[0])
+            .then((res) => {
+                pop.nodePostDb(recordStats)
                 .then( res => {
-                    if (res == 0) {
-                        console.log(`Chart data write finished`);
+                    if (res == 1) {
+                        //console.log(`Posted`);
+                    }
+                    else {
+                        console.log(`Unidentified return from nodePostDb = ${res}`);
                     }
                 })
                 .catch( err => {
                     console.log(err.stack);
+                    return;
                 })
+            })
+            .catch( err => {
+                console.log(err.stack);
+                    return;
+            })
+                
+        }    // End of currentAction === 'stats'
         
-        
-        }  // End of currentAction === 'charts' 
-        
+        else if (currentAction === 'charts') {
+            let chartdata = JSON.stringify(myData.data);
+            
+            let recordCharts = [
+                utctime,
+                chartdata
+            ]
+            pop.chartPostDb(recordCharts)
+            .then( res => {
+                if (res == 0) {
+                    console.log(`Chart data write finished`);
+                }
+            })
+            .catch( err => {
+                console.log(err.stack);
+            })
+        }
+            
     };
     
     function removeOldNodes(olderThanHours) {
