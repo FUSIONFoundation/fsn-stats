@@ -13,7 +13,7 @@ var connect = function(){
 
     //const wsclient = new WebSocketClient('ws://127.0.0.1:3000/primus');
     const wsclient = new WebSocketClient('wss://node.fusionnetwork.io/primus');
-    
+
     olderThanHours = 3;    // Remove nodes inactive for olderThanHours hours
     let timerId = 0;
     let blockNo = -1;
@@ -29,31 +29,31 @@ var connect = function(){
         console.log(new Date(),` Connection Error`);
     };
 
-    wsclient.onmessage = function(data) {
-        
+    wsclient.onmessage = async(data) => {
+
         //console.log(data.data);
-        
+
         now = new Date();
-        
+
         console.log(now, ` Received:  ${data.data.length} bytes`);
         let myData = JSON.parse(data.data);
         let currentAction = myData.action;
         console.log(`Current action is => ${currentAction}`);
-        
-                
+
+
         if (currentAction === 'init') {
             console.log(`Init. => ${myData.data[0]}`);
             info = JSON.stringify(myData.data[0]);
         };
-        
+
         if (myData.data.id && currentAction === 'block') {
             console.log(`Block No. => ${myData.data.block.number}`);
             blockNo = myData.data.block.number;
             timestamp = myData.data.block.timestamp;
             utctime = new Date(timestamp*1000).toISOString();    // UTC
-            
+
             blockdata = JSON.stringify(myData.data.block);
-            
+
             //console.log(`Height => ${myData.data.height}`);
             let recordBlock = [
                 utctime,
@@ -69,9 +69,9 @@ var connect = function(){
                 console.log(err.stack);
             })
 
-        }  // End of currentAction === 'blocks' 
-        
-        
+        }  // End of currentAction === 'blocks'
+
+
         if (myData.data.id && currentAction === 'stats') {
             console.log(`User ID => ${myData.data.id}`);
             let statdata = JSON.stringify(myData.data);
@@ -83,8 +83,8 @@ var connect = function(){
                 info
             ];
             //console.log(recordStats);
-            
-            pop.nodeDeleteDb(recordStats[0])
+
+            await pop.nodeDeleteDb(recordStats[0])
             .then((res) => {
                 pop.nodePostDb(recordStats)
                 .then( res => {
@@ -104,12 +104,12 @@ var connect = function(){
                 console.log(err.stack);
                     return;
             })
-                
+
         }    // End of currentAction === 'stats'
-        
+
         else if (currentAction === 'charts') {
             let chartdata = JSON.stringify(myData.data);
-            
+
             let recordCharts = [
                 utctime,
                 chartdata
@@ -124,9 +124,9 @@ var connect = function(){
                 console.log(err.stack);
             })
         }
-            
+
     };
-    
+
     function removeOldNodes(olderThanHours) {
         var checkTime = 1*60*1000;    // 1 minute
         setTimeout((olderThanHours) => {
@@ -161,7 +161,7 @@ var connect = function(){
             clearTimeout(timerId);
         }
     }
-    
+
     removeOldNodes(olderThanHours);
     keepAlive();
 };
