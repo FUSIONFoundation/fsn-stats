@@ -17,6 +17,7 @@
     "react-reveal": "^1.2.2",
     "react-scripts": "3.2.0",
     "react-timeago": "^4.4.0",
+    "react-tooltip": "^3.11.1",
     "recharts": "^1.7.1",
     "websocket": "^1.0.30"
   },

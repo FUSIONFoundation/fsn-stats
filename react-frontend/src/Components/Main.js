@@ -12,6 +12,7 @@ import {
     NavbarBrand,
     NavDropdown,
     Table,
+    Modal,
     Form,
     FormControl
 } from 'react-bootstrap'
@@ -22,6 +23,7 @@ import CountUp from 'react-countup';
 import Countdown from 'react-countdown-now';
 import Skeleton, {SkeletonTheme} from 'react-loading-skeleton';
 import TimeAgo from 'react-timeago';
+import ReactTooltip from 'react-tooltip'
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
 import Spinner from './Spinner';
 import {
@@ -81,8 +83,8 @@ class Main extends React.Component {
         let highestBlock = 0;
         let lastUpdatedBlock = 0;
         const processCharts = (data) => {
-            console.log(data);
             let chartData = JSON.parse(data.data[0].charts);
+            console.log(chartData);
             // let highestBlock = Math.max(...chartData.height);
             let heightChart = chartData.height;
             let avgBlockTime = chartData.avgBlocktime.toString().substr(0, 5);
@@ -165,7 +167,6 @@ class Main extends React.Component {
                 allNodes[objIndex].blockLastUpdated = (data.received * 1000);
 
                 if (Object.keys(allNodes).length === totalNodes) {
-                    console.log(allNodes);
                     allNodes.sort((a, b) => b.height - a.height);
                     this.setState({
                         nodesList: allNodes,
@@ -204,7 +205,7 @@ class Main extends React.Component {
 
     render() {
 
-        let pinnedNodes = JSON.parse(localStorage.getItem('pinnedNodes'));
+        let pinnedNodes = JSON.parse(localStorage.getItem('pinnedNodes')) === null ? [] : JSON.parse(localStorage.getItem('pinnedNodes')) ;
         const setPinnedNode = (nodename) => {
             let data = JSON.parse(localStorage.getItem('pinnedNodes'));
             let u = [];
@@ -217,6 +218,15 @@ class Main extends React.Component {
                 localStorage.setItem('pinnedNodes', JSON.stringify(data));
             }
             console.log(localStorage.getItem('pinnedNodes'))
+            this.forceUpdate();
+        }
+
+        const removePinnedNode = (nodename) => {
+            let data = JSON.parse(localStorage.getItem('pinnedNodes'));
+            const filteredItems = data.filter(item => item !== nodename);
+            localStorage.setItem('pinnedNodes', JSON.stringify(filteredItems));
+            console.log(localStorage.getItem('pinnedNodes'))
+            this.forceUpdate();
         }
 
         const blockClass = (nodeBlock, highestBlock) => {
@@ -255,11 +265,71 @@ class Main extends React.Component {
                 </g>
             );
         };
+
+        let show = false;
+
+        const setShow = (state,id) =>{
+            return this.setState({
+                showModal: state,
+                showDetailsId : id
+            });
+        }
+
+        const handleClose = () => setShow(false);
+        const handleShow = () => setShow(true);
+
         return <body className={'bg-dark'}>
         <div className={'main-content'}>
             <SkeletonTheme color="#202020" highlightColor="#444">
                 <Container fluid={true}>
-                    <Row>
+                    <Modal show={this.state.showModal} size="lg" onHide={handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Node Details</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            {this.state.showDetailsId ?
+                            <Row>
+                                <Col md={6} className={'text-stats'}>
+                                    <Row>
+                                        <Col md={6} className={'float-left'}>ID</Col>
+                                        <Col md={6} className={'float-right'}>{this.state.nodesList[this.state.showDetailsId].id}</Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6} className={'float-left'}>Type</Col>
+                                        <Col md={6} className={'float-right'}>Henk</Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6} className={'float-left'}>Height</Col>
+                                        <Col md={6} className={'float-right'}>Henk</Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6} className={'float-left'}>Syncing</Col>
+                                        <Col md={6} className={'float-right'}>Henk</Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6} className={'float-left'}>Mining</Col>
+                                        <Col md={6} className={'float-right'}>Henk</Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6} className={'float-left'}>Peers</Col>
+                                        <Col md={6} className={'float-right'}>Henk</Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6} className={'float-left'}>Location</Col>
+                                        <Col md={6} className={'float-right'}>United States</Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6} className={'float-left'}>ID</Col>
+                                        <Col md={6} className={'float-right'}>Linux</Col>
+                                    </Row>
+                                </Col>
+                                <Col md={6}>
+                                </Col>
+                            </Row>
+                                : '' }
+                        </Modal.Body>
+                    </Modal>
+                    <Row className={'text-center'}>
                         <Col md={12}>
                             <div className="alert alert-primary mt-2">
                                 Work in progress!
@@ -297,7 +367,6 @@ class Main extends React.Component {
                                             </span>
                                         </div>
                                         <div className="col-auto">
-                                            <span className="h2 fe fe-briefcase text-muted mb-0"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -315,8 +384,12 @@ class Main extends React.Component {
                                                 {this.state.avgBlockTime || <Spinner/>}
                                             </span>
                                         </div>
-                                        <div className="col-auto">
-                                            <span className="h2 fe fe-briefcase text-muted mb-0"></span>
+                                        <div className="col-auto text-center">
+                                            <span className={'text-stats'}>Last 40 blocks</span>
+                                            <br/>
+                                            <span className={'text-stats'}>min 12.04 s</span>
+                                            <br/>
+                                            <span className={'text-stats'}>max 12.04 s</span>
                                         </div>
                                     </div>
                                 </div>
@@ -335,21 +408,28 @@ class Main extends React.Component {
                                             </span>
                                         </div>
                                         <div className="col-auto">
-                                            <span className="h2 fe fe-briefcase text-muted mb-0"></span>
+                                            <span className={'text-stats'}>Last 40 blocks</span>
+                                            <br/>
+                                            <span className={'text-stats'}>min 12.04s</span>
+                                            <br/>
+                                            <span className={'text-stats'}>max 12.04s</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </Col>
                     </Row>
+
                     <Col md={12} className={'text-stats'}>
                         <div className={'float-md-left'}>
                             <span className={'mr-2'}>Active Nodes</span> {this.state.totalNodes ? <span className={'nodes-badge p-1'}>{this.state.totalNodes}</span> : <Spinner/>}
+                            {pinnedNodes.length > 0 ? <span className={'ml-2'}>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ? <span className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
                         </div>
                         <div className={'float-md-right'}>
                            Updating In: <TimeAgo date={this.state.lastUpdatedData}/>
                         </div>
                     </Col>
+
                     <Col className={'table-responsive pt-3'} md={12}>
                         <Table className={'table table-sm table-nowrap card-table'} borderless variant="">
                             <thead className={'text-center text-muted'}>
@@ -372,12 +452,52 @@ class Main extends React.Component {
                             </tr>
                             </thead>
                             <tbody className={'text-center'}>
+                            {this.state.nodeIdentifiers.map(((key, index) =>
+                            pinnedNodes.includes(this.state.nodesList[index].id) ?
+                            <tr>
+                                <td>
+                                    <a onClick={function () {
+                                    removePinnedNode(this.state.nodesList[index].id)
+                                }.bind(this)}>
+                                    -
+                                </a></td>
+                                <td>{this.state.nodesList[index].stats.active ?
+                                    <span className="text-success">●</span> :
+                                    <span className="text-danger">●</span>}</td>
+                                <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
+                                    code={this.state.nodesList[index].geo.country.toLowerCase()}
+                                    svg/> : '?'}</td>
+                                <td>{this.state.nodesList[index].id}</td>
+                                <td>{this.state.nodesList[index].info.node}</td>
+                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
+                                <Spinner/>} <span
+                                    className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
+                                </td>
+                                <td>{this.state.nodesList[index].stats.block.received ?
+                                    <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
+                                    <Spinner/>}</td>
+                                <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
+                                <td>{this.state.nodesList[index].stats.mining ?
+                                    <span className="text-success">●</span> :
+                                    <span className="text-danger">●</span>}</td>
+                                <td>{this.state.nodesList[index].stats.syncing ?
+                                    <span className="text-success">●</span> :
+                                    <span className="text-danger">●</span>}</td>
+                                <td>{this.state.nodesList[index].stats.peers}</td>
+                                <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
+                                                 label={`${this.state.nodesList[index].stats.uptime}%`}/>
+                                </td>
+                                <td>{this.state.nodesList[index].stats.latency}ms</td>
+                            </tr>
+                            : ''
+                            ))}
                             {
                                 this.state.nodeIdentifiers.map(((key, index) =>
+                                        !pinnedNodes.includes(this.state.nodesList[index].id) ?
                                         <tr>
                                             <td><a onClick={function () {
                                                 setPinnedNode(this.state.nodesList[index].id)
-                                            }.bind(this)} className="btn btn-sm btn-rounded-circle btn-white">
+                                            }.bind(this)}>
                                                 +
                                             </a></td>
                                             <td>{this.state.nodesList[index].stats.active ?
@@ -392,7 +512,7 @@ class Main extends React.Component {
                                             <Spinner/>} <span
                                                 className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
                                             </td>
-                                            <td className={timeClass(this.state.nodesList[index].stats.block.received)}>{this.state.nodesList[index].stats.block.received ?
+                                            <td>{this.state.nodesList[index].stats.block.received ?
                                                 <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
                                                 <Spinner/>}</td>
                                             <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
@@ -408,6 +528,7 @@ class Main extends React.Component {
                                             </td>
                                             <td>{this.state.nodesList[index].stats.latency}ms</td>
                                         </tr>
+                                            : ''
                                 ))
                             }
                             </tbody>
