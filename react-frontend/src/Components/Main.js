@@ -18,6 +18,7 @@ import {
 } from 'react-bootstrap'
 import Fade from 'react-reveal/Fade';
 import axios from 'axios';
+import Datamap from 'react-datamaps';
 import ReactCountryFlag from "react-country-flag";
 import CountUp from 'react-countup';
 import Countdown from 'react-countdown-now';
@@ -55,14 +56,14 @@ class Main extends React.Component {
 
         let totalNodes = undefined;
         const getData = () => {
-                console.log('Retrieving data')
-                axios.get('http://93.89.252.58:3002/nodes').then(async function (data) {
-                    totalNodes = data.data.length;
-                    let nodeData = data.data;
-                    for (let node in nodeData) {
-                        processStats(nodeData[node]);
-                    }
-                });
+            console.log('Retrieving data')
+            axios.get('http://93.89.252.58:3002/nodes').then(async function (data) {
+                totalNodes = data.data.length;
+                let nodeData = data.data;
+                for (let node in nodeData) {
+                    processStats(nodeData[node]);
+                }
+            });
         }
 
         getData();
@@ -84,7 +85,6 @@ class Main extends React.Component {
         let lastUpdatedBlock = 0;
         const processCharts = (data) => {
             let chartData = JSON.parse(data.data[0].charts);
-            console.log(chartData);
             // let highestBlock = Math.max(...chartData.height);
             let heightChart = chartData.height;
             let avgBlockTime = chartData.avgBlocktime.toString().substr(0, 5);
@@ -108,6 +108,7 @@ class Main extends React.Component {
         }
 
 
+        let geoCharts = [];
         const processStats = async (data) => {
             let id = data.id;
             let stats = JSON.parse(data.stats);
@@ -116,6 +117,17 @@ class Main extends React.Component {
             stats.id = id;
             stats.info = info;
             stats.geo = geo;
+
+            if(geo !== null) {
+                let geoData = {
+                    name: id,
+                    radius: 2,
+                    latitude: geo.ll[0],
+                    longitude: geo.ll[1],
+                    fillKey: 'bubbleFill'
+                };
+                geoCharts.push(geoData);
+            }
 
             // Make hash smaller
             stats.stats.block.hash = formatHash(stats.stats.block.hash);
@@ -135,8 +147,11 @@ class Main extends React.Component {
                 this.setState({
                     totalNodes: Object.keys(allNodes).length,
                     nodeIdentifiers: identifiers,
-                    nodesList: allNodes
+                    nodesList: allNodes,
+                    geoCharts: geoCharts
                 });
+
+                this.forceUpdate();
             }
 
             await processBlocks(stats.stats.block, id);
@@ -177,7 +192,9 @@ class Main extends React.Component {
                     })
 
                     allNodes = [];
-                    setTimeout(function(){getData()},4000)
+                    setTimeout(function () {
+                        getData()
+                    }, 4000)
                 }
             }
         }
@@ -205,7 +222,7 @@ class Main extends React.Component {
 
     render() {
 
-        let pinnedNodes = JSON.parse(localStorage.getItem('pinnedNodes')) === null ? [] : JSON.parse(localStorage.getItem('pinnedNodes')) ;
+        let pinnedNodes = JSON.parse(localStorage.getItem('pinnedNodes')) === null ? [] : JSON.parse(localStorage.getItem('pinnedNodes'));
         const setPinnedNode = (nodename) => {
             let data = JSON.parse(localStorage.getItem('pinnedNodes'));
             let u = [];
@@ -226,11 +243,12 @@ class Main extends React.Component {
             const filteredItems = data.filter(item => item !== nodename);
             localStorage.setItem('pinnedNodes', JSON.stringify(filteredItems));
             console.log(localStorage.getItem('pinnedNodes'))
-            if(filteredItems.length === 0){
+            if (filteredItems.length === 0) {
                 this.setState({
                     hideNonPinned: false
                 })
-            };
+            }
+            ;
 
             this.forceUpdate();
         }
@@ -248,9 +266,9 @@ class Main extends React.Component {
 
         const latencyClass = (latency) => {
 
-            if(latency > 100){
+            if (latency > 100) {
                 return 'text-warn'
-            } else if(latency >= 1000){
+            } else if (latency >= 1000) {
                 return 'text-danger';
             }
         };
@@ -268,10 +286,10 @@ class Main extends React.Component {
 
         let show = false;
 
-        const setShow = (state,id) =>{
+        const setShow = (state, id) => {
             return this.setState({
                 showModal: state,
-                showDetailsId : id
+                showDetailsId: id
             });
         }
 
@@ -282,7 +300,7 @@ class Main extends React.Component {
         const setNonPinned = (state) => {
             console.log(state);
             this.setState({
-                hideNonPinned : state
+                hideNonPinned: state
             });
             this.forceUpdate();
         };
@@ -325,7 +343,8 @@ class Main extends React.Component {
                                                 Block Time Ago
                                             </h6>
                                             <span className="h2 mb-0">
-                                                {this.state.lastUpdatedBlock ? <TimeAgo date={this.state.lastUpdatedBlock}/> : <Spinner/>}
+                                                {this.state.lastUpdatedBlock ?
+                                                    <TimeAgo date={this.state.lastUpdatedBlock}/> : <Spinner/>}
                                             </span>
                                         </div>
                                         <div className="col-auto">
@@ -373,18 +392,37 @@ class Main extends React.Component {
                                 </div>
                             </div>
                         </Col>
+                        <Col md={4}>
+                            {this.state.geoCharts ?
+                            <Datamap
+                                fills={{
+                                    defaultFill: '#152e4d',
+                                    bubbleFill: '#ebebeb'
+                                }}
+                                responsive={true}
+                                bubbles={this.state.geoCharts}
+                            /> : <Spinner/>}
+                        </Col>
                     </Row>
 
-                    <Col md={12} className={'text-stats'}>
+                    <Col md={12} className={'text-stats pt-2'}>
                         <div className={'float-md-left'}>
-                            <span className={'mr-3'}>Active Nodes</span> {this.state.totalNodes ? <span className={'nodes-badge p-1'}>{this.state.totalNodes}</span> : <Spinner/>}
-                            {pinnedNodes.length > 0 ? <span className={'ml-3'}>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ? <span className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
-                            { pinnedNodes.length > 0 ? <span className={'ml-3'}>
-                                Hide non-pinned Nodes { !this.state.hideNonPinned ? <span className={'fe fe-square'} onClick={() => {setNonPinned(true)}}></span> : <span className={'fe fe-x-square'} onClick={() => {setNonPinned(false)}}></span> }
-                            </span>: ''}
-                            </div>
+                            <span className={'mr-3'}>Active Nodes</span> {this.state.totalNodes ?
+                            <span className={'nodes-badge p-1'}>{this.state.totalNodes}</span> : <Spinner/>}
+                            {pinnedNodes.length > 0 ?
+                                <span className={'ml-3'}>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ?
+                            <span className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
+                            {pinnedNodes.length > 0 ? <span className={'ml-3'}>
+                                Hide non-pinned Nodes {!this.state.hideNonPinned ?
+                                <span className={'fe fe-square'} onClick={() => {
+                                    setNonPinned(true)
+                                }}></span> : <span className={'fe fe-x-square'} onClick={() => {
+                                    setNonPinned(false)
+                                }}></span>}
+                            </span> : ''}
+                        </div>
                         <div className={'float-md-right'}>
-                           Updating In: <TimeAgo date={this.state.lastUpdatedData}/>
+                            Updating In: <TimeAgo date={this.state.lastUpdatedData}/>
                         </div>
                     </Col>
 
@@ -411,53 +449,14 @@ class Main extends React.Component {
                             </thead>
                             <tbody className={'text-center'}>
                             {this.state.nodeIdentifiers.map(((key, index) =>
-                            pinnedNodes.includes(this.state.nodesList[index].id) ?
-                            <tr>
-                                <td>
-                                    <a onClick={function () {
-                                    removePinnedNode(this.state.nodesList[index].id)
-                                }.bind(this)}>
-                                        <span className="fe fe-minus-square text-muted mb-0"></span>
-                                    </a></td>
-                                <td>{this.state.nodesList[index].stats.active ?
-                                    <span className="text-success">●</span> :
-                                    <span className="text-danger">●</span>}</td>
-                                <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
-                                    code={this.state.nodesList[index].geo.country.toLowerCase()}
-                                    svg/> : '?'}</td>
-                                <td>{this.state.nodesList[index].id}</td>
-                                <td>{this.state.nodesList[index].info.node}</td>
-                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
-                                <Spinner/>} <span
-                                    className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
-                                </td>
-                                <td>{this.state.nodesList[index].stats.block.received ?
-                                    <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
-                                    <Spinner/>}</td>
-                                <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
-                                <td>{this.state.nodesList[index].stats.mining ?
-                                    <span className="text-success">●</span> :
-                                    <span className="text-danger">●</span>}</td>
-                                <td>{this.state.nodesList[index].stats.syncing ?
-                                    <span className="text-success">●</span> :
-                                    <span className="text-danger">●</span>}</td>
-                                <td>{this.state.nodesList[index].stats.peers}</td>
-                                <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
-                                                 label={`${this.state.nodesList[index].stats.uptime}%`}/>
-                                </td>
-                                <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
-                            </tr>
-                            : ''
-                            ))}
-                            {
-                                this.state.nodeIdentifiers.map(((key, index) =>
-                                        !pinnedNodes.includes(this.state.nodesList[index].id) && !this.state.hideNonPinned ?
+                                    pinnedNodes.includes(this.state.nodesList[index].id) ?
                                         <tr>
-                                            <td><a onClick={function () {
-                                                setPinnedNode(this.state.nodesList[index].id)
-                                            }.bind(this)}>
-                                                <span className="fe fe-square text-muted mb-0"></span>
-                                            </a></td>
+                                            <td>
+                                                <a onClick={function () {
+                                                    removePinnedNode(this.state.nodesList[index].id)
+                                                }.bind(this)}>
+                                                    <span className="fe fe-minus-square text-muted mb-0"></span>
+                                                </a></td>
                                             <td>{this.state.nodesList[index].stats.active ?
                                                 <span className="text-success">●</span> :
                                                 <span className="text-danger">●</span>}</td>
@@ -486,6 +485,45 @@ class Main extends React.Component {
                                             </td>
                                             <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
                                         </tr>
+                                        : ''
+                            ))}
+                            {
+                                this.state.nodeIdentifiers.map(((key, index) =>
+                                        !pinnedNodes.includes(this.state.nodesList[index].id) && !this.state.hideNonPinned ?
+                                            <tr>
+                                                <td><a onClick={function () {
+                                                    setPinnedNode(this.state.nodesList[index].id)
+                                                }.bind(this)}>
+                                                    <span className="fe fe-square text-muted mb-0"></span>
+                                                </a></td>
+                                                <td>{this.state.nodesList[index].stats.active ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
+                                                    code={this.state.nodesList[index].geo.country.toLowerCase()}
+                                                    svg/> : '?'}</td>
+                                                <td>{this.state.nodesList[index].id}</td>
+                                                <td>{this.state.nodesList[index].info.node}</td>
+                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
+                                                <Spinner/>} <span
+                                                    className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
+                                                </td>
+                                                <td>{this.state.nodesList[index].stats.block.received ?
+                                                    <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
+                                                    <Spinner/>}</td>
+                                                <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
+                                                <td>{this.state.nodesList[index].stats.mining ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].stats.syncing ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].stats.peers}</td>
+                                                <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
+                                                                 label={`${this.state.nodesList[index].stats.uptime}%`}/>
+                                                </td>
+                                                <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
+                                            </tr>
                                             : ''
                                 ))
                             }
