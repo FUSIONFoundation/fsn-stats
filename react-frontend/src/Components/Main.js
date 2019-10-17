@@ -240,18 +240,12 @@ class Main extends React.Component {
             ;
         }
 
-        const timeClass = (timestamp) => {
-            if (!timestamp || isNaN(timestamp)) return;
+        const latencyClass = (latency) => {
 
-            let timeStamp = new Date(timestamp);
-            let now = Date.now();
-            let q = (now - timeStamp);
-
-            if(q > 15000){
-                return 'text-danger'
-            }
-            if(q > 12000){
-                return 'text-warn';
+            if(latency > 100){
+                return 'text-warn'
+            } else if(latency >= 1000){
+                return 'text-danger';
             }
         };
 
@@ -487,7 +481,7 @@ class Main extends React.Component {
                                 <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
                                                  label={`${this.state.nodesList[index].stats.uptime}%`}/>
                                 </td>
-                                <td>{this.state.nodesList[index].stats.latency}ms</td>
+                                <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
                             </tr>
                             : ''
                             ))}
@@ -526,7 +520,7 @@ class Main extends React.Component {
                                             <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
                                                              label={`${this.state.nodesList[index].stats.uptime}%`}/>
                                             </td>
-                                            <td>{this.state.nodesList[index].stats.latency}ms</td>
+                                            <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
                                         </tr>
                                             : ''
                                 ))
