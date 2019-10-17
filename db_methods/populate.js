@@ -96,8 +96,9 @@ class Populate  {
                     //console.log(query);
                     client.query(query)
                         .then(res => {
+                            console.log(`Updated ${record[0]}`);
                             client.release();
-                            resolve(1);
+                            resolve(res);
                             return;
                         })
                         .catch(err => {

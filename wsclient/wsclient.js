@@ -90,29 +90,27 @@ var connect = function(){
             //await pop.nodeDeleteDb(recordStats[0])
             pop.nodeUpdateDb(recordStats)
             .then((res) => {
-                
+                //console.log(res);
+                if (res.rowCount == 0) {
+                    pop.nodePostDb(recordStats)
+                    .then( res => {
+                        if (res == 1) {
+                            //console.log(`Posted`);
+                        }
+                        else {
+                            console.log(`Unidentified return from nodePostDb = ${res}`);
+                        }
+                    })
+                    .catch( err => {
+                        //console.log(err.stack);
+                        console.log(err.detail);
+                        return;
+                    })
+                }
             })
             .catch( err => {
-                if (err.detail == 'undefined') {
-                    console.log(`Node has not yet been defined, posting it...`);
-                }
-                else {
-                    console.error(err.stack);
-                }
-                pop.nodePostDb(recordStats)
-                .then( res => {
-                    if (res == 1) {
-                        //console.log(`Posted`);
-                    }
-                    else {
-                        console.log(`Unidentified return from nodePostDb = ${res}`);
-                    }
-                })
-                .catch( err => {
-                    //console.log(err.stack);
-                    console.log(err.detail);
-                    return;
-                })
+                //console.log(err);
+                console.error(err.stack);
             })
 
         }    // End of currentAction === 'stats'
