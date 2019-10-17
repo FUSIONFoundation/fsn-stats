@@ -165,6 +165,8 @@ class Main extends React.Component {
                 allNodes[objIndex].blockLastUpdated = (data.timestamp * 1000);
 
                 if (Object.keys(allNodes).length === totalNodes) {
+                    console.log(allNodes);
+                    allNodes.sort((a, b) => b.height - a.height);
                     this.setState({
                         nodesList: allNodes,
                         highestBlock: highestBlock,
@@ -357,7 +359,7 @@ class Main extends React.Component {
                             <tbody className={'text-center'}>
                             {
                                 this.state.nodeIdentifiers.map(((key, index) =>
-                                        <tr className='animated fadeIn'>
+                                        <tr>
                                             <td><a onClick={function () {
                                                 setPinnedNode(this.state.nodesList[index].id)
                                             }.bind(this)} className="btn btn-sm btn-rounded-circle btn-white">
