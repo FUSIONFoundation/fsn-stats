@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import Main from './Components/Main';
 import './App.css';
 import './css/theme-dark.min.css';
+import './fonts/feather/feather.min.css';
 
 function App() {
   return (

@@ -226,6 +226,12 @@ class Main extends React.Component {
             const filteredItems = data.filter(item => item !== nodename);
             localStorage.setItem('pinnedNodes', JSON.stringify(filteredItems));
             console.log(localStorage.getItem('pinnedNodes'))
+            if(filteredItems.length === 0){
+                this.setState({
+                    hideNonPinned: false
+                })
+            };
+
             this.forceUpdate();
         }
 
@@ -272,58 +278,20 @@ class Main extends React.Component {
         const handleClose = () => setShow(false);
         const handleShow = () => setShow(true);
 
+        let hideNonPinned = false;
+        const setNonPinned = (state) => {
+            console.log(state);
+            this.setState({
+                hideNonPinned : state
+            });
+            this.forceUpdate();
+        };
+
         return <body className={'bg-dark'}>
         <div className={'main-content'}>
             <SkeletonTheme color="#202020" highlightColor="#444">
                 <Container fluid={true}>
-                    <Modal show={this.state.showModal} size="lg" onHide={handleClose}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Node Details</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            {this.state.showDetailsId ?
-                            <Row>
-                                <Col md={6} className={'text-stats'}>
-                                    <Row>
-                                        <Col md={6} className={'float-left'}>ID</Col>
-                                        <Col md={6} className={'float-right'}>{this.state.nodesList[this.state.showDetailsId].id}</Col>
-                                    </Row>
-                                    <Row>
-                                        <Col md={6} className={'float-left'}>Type</Col>
-                                        <Col md={6} className={'float-right'}>Henk</Col>
-                                    </Row>
-                                    <Row>
-                                        <Col md={6} className={'float-left'}>Height</Col>
-                                        <Col md={6} className={'float-right'}>Henk</Col>
-                                    </Row>
-                                    <Row>
-                                        <Col md={6} className={'float-left'}>Syncing</Col>
-                                        <Col md={6} className={'float-right'}>Henk</Col>
-                                    </Row>
-                                    <Row>
-                                        <Col md={6} className={'float-left'}>Mining</Col>
-                                        <Col md={6} className={'float-right'}>Henk</Col>
-                                    </Row>
-                                    <Row>
-                                        <Col md={6} className={'float-left'}>Peers</Col>
-                                        <Col md={6} className={'float-right'}>Henk</Col>
-                                    </Row>
-                                    <Row>
-                                        <Col md={6} className={'float-left'}>Location</Col>
-                                        <Col md={6} className={'float-right'}>United States</Col>
-                                    </Row>
-                                    <Row>
-                                        <Col md={6} className={'float-left'}>ID</Col>
-                                        <Col md={6} className={'float-right'}>Linux</Col>
-                                    </Row>
-                                </Col>
-                                <Col md={6}>
-                                </Col>
-                            </Row>
-                                : '' }
-                        </Modal.Body>
-                    </Modal>
-                    <Row className={'text-center'}>
+                    <Row>
                         <Col md={12}>
                             <div className="alert alert-primary mt-2">
                                 Work in progress!
@@ -342,7 +310,7 @@ class Main extends React.Component {
                                             </span>
                                         </div>
                                         <div className="col-auto">
-                                            <span className="h2 fe fe-briefcase text-muted mb-0"></span>
+                                            <span className="h2 fe fe-box text-muted mb-0"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -361,6 +329,7 @@ class Main extends React.Component {
                                             </span>
                                         </div>
                                         <div className="col-auto">
+                                            <span className="h2 fe fe-clock text-muted mb-0"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -379,11 +348,7 @@ class Main extends React.Component {
                                             </span>
                                         </div>
                                         <div className="col-auto text-center">
-                                            <span className={'text-stats'}>Last 40 blocks</span>
-                                            <br/>
-                                            <span className={'text-stats'}>min 12.04 s</span>
-                                            <br/>
-                                            <span className={'text-stats'}>max 12.04 s</span>
+                                            <span className="h2 fe fe-briefcase text-muted mb-0"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -402,11 +367,7 @@ class Main extends React.Component {
                                             </span>
                                         </div>
                                         <div className="col-auto">
-                                            <span className={'text-stats'}>Last 40 blocks</span>
-                                            <br/>
-                                            <span className={'text-stats'}>min 12.04s</span>
-                                            <br/>
-                                            <span className={'text-stats'}>max 12.04s</span>
+                                            <span className="h2 fe fe-credit-card text-muted mb-0"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -416,9 +377,12 @@ class Main extends React.Component {
 
                     <Col md={12} className={'text-stats'}>
                         <div className={'float-md-left'}>
-                            <span className={'mr-2'}>Active Nodes</span> {this.state.totalNodes ? <span className={'nodes-badge p-1'}>{this.state.totalNodes}</span> : <Spinner/>}
-                            {pinnedNodes.length > 0 ? <span className={'ml-2'}>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ? <span className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
-                        </div>
+                            <span className={'mr-3'}>Active Nodes</span> {this.state.totalNodes ? <span className={'nodes-badge p-1'}>{this.state.totalNodes}</span> : <Spinner/>}
+                            {pinnedNodes.length > 0 ? <span className={'ml-3'}>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ? <span className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
+                            { pinnedNodes.length > 0 ? <span className={'ml-3'}>
+                                Hide non-pinned Nodes { !this.state.hideNonPinned ? <span className={'fe fe-square'} onClick={() => {setNonPinned(true)}}></span> : <span className={'fe fe-x-square'} onClick={() => {setNonPinned(false)}}></span> }
+                            </span>: ''}
+                            </div>
                         <div className={'float-md-right'}>
                            Updating In: <TimeAgo date={this.state.lastUpdatedData}/>
                         </div>
@@ -453,8 +417,8 @@ class Main extends React.Component {
                                     <a onClick={function () {
                                     removePinnedNode(this.state.nodesList[index].id)
                                 }.bind(this)}>
-                                    -
-                                </a></td>
+                                        <span className="fe fe-minus-square text-muted mb-0"></span>
+                                    </a></td>
                                 <td>{this.state.nodesList[index].stats.active ?
                                     <span className="text-success">●</span> :
                                     <span className="text-danger">●</span>}</td>
@@ -487,12 +451,12 @@ class Main extends React.Component {
                             ))}
                             {
                                 this.state.nodeIdentifiers.map(((key, index) =>
-                                        !pinnedNodes.includes(this.state.nodesList[index].id) ?
+                                        !pinnedNodes.includes(this.state.nodesList[index].id) && !this.state.hideNonPinned ?
                                         <tr>
                                             <td><a onClick={function () {
                                                 setPinnedNode(this.state.nodesList[index].id)
                                             }.bind(this)}>
-                                                +
+                                                <span className="fe fe-square text-muted mb-0"></span>
                                             </a></td>
                                             <td>{this.state.nodesList[index].stats.active ?
                                                 <span className="text-success">●</span> :
