@@ -155,14 +155,14 @@ class Main extends React.Component {
 
                 if (data.number > highestBlock) {
                     highestBlock = data.number;
-                    lastUpdatedBlock = new Date().getTime();
+                    lastUpdatedBlock = data.received;
                 }
 
 
                 allNodes[objIndex].height = data.number;
                 allNodes[objIndex].propagationChart = propagationChart;
                 allNodes[objIndex].hash = formatHash(data.hash);
-                allNodes[objIndex].blockLastUpdated = (data.timestamp * 1000);
+                allNodes[objIndex].blockLastUpdated = (data.received * 1000);
 
                 if (Object.keys(allNodes).length === totalNodes) {
                     console.log(allNodes);
@@ -176,7 +176,7 @@ class Main extends React.Component {
                     })
 
                     allNodes = [];
-                    setTimeout(function(){getData()},5000)
+                    setTimeout(function(){getData()},4000)
                 }
             }
         }
@@ -229,6 +229,21 @@ class Main extends React.Component {
             }
             ;
         }
+
+        const timeClass = (timestamp) => {
+            if (!timestamp || isNaN(timestamp)) return;
+
+            let timeStamp = new Date(timestamp);
+            let now = Date.now();
+            let q = (now - timeStamp);
+
+            if(q > 15000){
+                return 'text-danger'
+            }
+            if(q > 12000){
+                return 'text-warn';
+            }
+        };
 
         const RoundedBar = (props) => {
             const {fill, x, y, height} = props;
@@ -377,7 +392,7 @@ class Main extends React.Component {
                                             <Spinner/>} <span
                                                 className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
                                             </td>
-                                            <td>{this.state.nodesList[index].stats.block.received ?
+                                            <td className={timeClass(this.state.nodesList[index].stats.block.received)}>{this.state.nodesList[index].stats.block.received ?
                                                 <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
                                                 <Spinner/>}</td>
                                             <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
