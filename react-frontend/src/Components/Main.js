@@ -192,6 +192,7 @@ class Main extends React.Component {
                     })
 
                     allNodes = [];
+                    identifiers = [];
                     setTimeout(function () {
                         getData()
                     }, 4000)
@@ -234,7 +235,7 @@ class Main extends React.Component {
                 data.push(nodename);
                 localStorage.setItem('pinnedNodes', JSON.stringify(data));
             }
-            console.log(localStorage.getItem('pinnedNodes'))
+            console.log(localStorage.getItem('pinnedNodes'));
             this.forceUpdate();
         }
 
