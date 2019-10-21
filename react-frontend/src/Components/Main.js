@@ -54,27 +54,25 @@ class Main extends React.Component {
         let allNodes = [];
         let identifiers = [];
 
-        let totalNodes = undefined;
+        let totalNodes = 0;
         const getData = () => {
             console.log('Retrieving data')
+            let countNodes = 0;
             axios.get('http://93.89.252.58:3002/nodes').then(async function (data) {
-                totalNodes = data.data.length;
                 let nodeData = data.data;
                 for (let node in nodeData) {
-                    processStats(nodeData[node]);
+                    if(nodeData[node].id.indexOf('★GoFSN.com|t.me/gofusion★') === -1) {
+                        countNodes++;
+                        if (nodeData.length === (parseInt(node)+1)) {
+                            totalNodes = countNodes;
+                        }
+                        processStats(nodeData[node]);
+                    }
                 }
             });
         }
 
         getData();
-
-        // axios.get('http://93.89.252.58:3002/blocks').then(function (data) {
-        //     console.log(data);
-        // });
-
-        // axios.get('http://93.89.252.58:3002/info').then(function (data) {
-        //     console.log(data);
-        // });
 
         axios.get('http://93.89.252.58:3002/charts').then(function (data) {
             processCharts(data);
@@ -132,15 +130,16 @@ class Main extends React.Component {
             // Make hash smaller
             stats.stats.block.hash = formatHash(stats.stats.block.hash);
 
-            let objIndex = allNodes.findIndex((value => value.id === id));
-            if (objIndex === -1) {
-                allNodes.push(stats);
-                objIndex = allNodes.findIndex((value => value.id === id));
-                identifiers[objIndex] = id;
-            } else {
-                objIndex = allNodes.findIndex((value => value.id === id));
-                identifiers[objIndex] = id;
-            }
+                let objIndex = allNodes.findIndex((value => value.id === id));
+                if (objIndex === -1) {
+                    allNodes.push(stats);
+                    objIndex = allNodes.findIndex((value => value.id === id));
+                    identifiers[objIndex] = id;
+                } else {
+                    objIndex = allNodes.findIndex((value => value.id === id));
+                    identifiers[objIndex] = id;
+                }
+
 
 
             if (Object.keys(allNodes).length === totalNodes) {
@@ -150,7 +149,6 @@ class Main extends React.Component {
                     nodesList: allNodes,
                     geoCharts: geoCharts
                 });
-
                 this.forceUpdate();
             }
 
@@ -393,16 +391,44 @@ class Main extends React.Component {
                                 </div>
                             </div>
                         </Col>
-                        <Col md={4}>
-                            {this.state.geoCharts ?
-                            <Datamap
-                                fills={{
-                                    defaultFill: '#152e4d',
-                                    bubbleFill: '#ebebeb'
-                                }}
-                                responsive={true}
-                                bubbles={this.state.geoCharts}
-                            /> : <Spinner/>}
+                        <Col md={2}>
+                            <div className="card">
+                                <div className="card-body">
+                                    <div className="row align-items-center">
+                                        <div className="col">
+                                            <h6 className="card-title text-uppercase text-muted mb-2">
+                                                Pending Transactions
+                                            </h6>
+                                            <span className="h2 mb-0">
+                                                {this.state.ticketNumber || <Spinner/>}
+                                            </span>
+                                        </div>
+                                        <div className="col-auto">
+                                            <span className="h2 fe fe-credit-card text-muted mb-0"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col md={2}>
+                            <div className="card">
+                                <div className="card-body">
+                                    <div className="row align-items-center">
+                                        <div className="col">
+                                            <h6 className="card-title text-uppercase text-muted mb-2">
+                                                Geo
+                                            </h6>
+                                            <button className={'btn btn-sm btn-primary'}>lol</button>
+                                            <span className="h2 mb-0">
+                                                {this.state.ticketNumber || <Spinner/>}
+                                            </span>
+                                        </div>
+                                        <div className="col-auto">
+                                            <span className="h2 fe fe-credit-card text-muted mb-0"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </Col>
                     </Row>
 
