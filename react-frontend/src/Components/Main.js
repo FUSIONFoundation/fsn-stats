@@ -17,6 +17,7 @@ import {
     FormControl
 } from 'react-bootstrap'
 import Fade from 'react-reveal/Fade';
+import Tooltip from '@material-ui/core/Tooltip';
 import Delay from './Delay';
 import axios from 'axios';
 import Datamap from 'react-datamaps';
@@ -35,7 +36,6 @@ import {
     ResponsiveContainer,
     Line,
     Bar,
-    Tooltip,
     YAxis,
     Legend,
     XAxis,
@@ -480,20 +480,18 @@ class Main extends React.Component {
                             <thead className={'text-center text-muted'}>
                             <tr>
                                 <th>Pin</th>
-                                <th data-toggle="tooltip" data-placement="top" title=""
-                                    data-original-title="Tooltip on top">Active
-                                </th>
-                                <th>Location</th>
-                                <th>ID</th>
-                                <th>Type</th>
-                                <th>Height</th>
-                                <th>Block Time</th>
-                                <th>Tickets</th>
-                                <th>Mining</th>
-                                <th>Syncing</th>
-                                <th>Peers</th>
+                                <th>Active</th>
+                                <Tooltip title="Location of the node"><th>Location</th></Tooltip>
+                                <Tooltip title="Name of the node"><th>ID</th></Tooltip>
+                                <Tooltip title="Current version of efsn"><th>Type</th></Tooltip>
+                                <Tooltip title="The current block height the node is at"><th>Height</th></Tooltip>
+                                <Tooltip title="Time since last block"><th>Block Time</th></Tooltip>
+                                <Tooltip title="Add"><th>Tickets</th></Tooltip>
+                                <Tooltip title="Mining state"><th>Mining</th></Tooltip>
+                                <Tooltip title="Syncing state"><th>Syncing</th></Tooltip>
+                                <Tooltip title="Amount of peers"><th>Peers</th></Tooltip>
                                 <th>Uptime</th>
-                                <th>Latency</th>
+                                <Tooltip title="Latency between stats server and the node"><th>Latency</th></Tooltip>
                             </tr>
                             </thead>
                             <tbody className={'text-center'}>
