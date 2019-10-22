@@ -17,6 +17,7 @@ import {
     FormControl
 } from 'react-bootstrap'
 import Fade from 'react-reveal/Fade';
+import Delay from './Delay';
 import axios from 'axios';
 import Datamap from 'react-datamaps';
 import ReactCountryFlag from "react-country-flag";
@@ -61,9 +62,9 @@ class Main extends React.Component {
             axios.get('http://93.89.252.58:3002/nodes').then(async function (data) {
                 let nodeData = data.data;
                 for (let node in nodeData) {
-                    if(nodeData[node].id.indexOf('★GoFSN.com|t.me/gofusion★') === -1) {
+                    if (nodeData[node].id.indexOf('★GoFSN.com|t.me/gofusion★') === -1) {
                         countNodes++;
-                        if (nodeData.length === (parseInt(node)+1)) {
+                        if (nodeData.length === (parseInt(node) + 1)) {
                             totalNodes = countNodes;
                         }
                         processStats(nodeData[node]);
@@ -116,7 +117,7 @@ class Main extends React.Component {
             stats.info = info;
             stats.geo = geo;
 
-            if(geo !== null) {
+            if (geo !== null) {
                 let geoData = {
                     name: id,
                     radius: 2,
@@ -130,16 +131,15 @@ class Main extends React.Component {
             // Make hash smaller
             stats.stats.block.hash = formatHash(stats.stats.block.hash);
 
-                let objIndex = allNodes.findIndex((value => value.id === id));
-                if (objIndex === -1) {
-                    allNodes.push(stats);
-                    objIndex = allNodes.findIndex((value => value.id === id));
-                    identifiers[objIndex] = id;
-                } else {
-                    objIndex = allNodes.findIndex((value => value.id === id));
-                    identifiers[objIndex] = id;
-                }
-
+            let objIndex = allNodes.findIndex((value => value.id === id));
+            if (objIndex === -1) {
+                allNodes.push(stats);
+                objIndex = allNodes.findIndex((value => value.id === id));
+                identifiers[objIndex] = id;
+            } else {
+                objIndex = allNodes.findIndex((value => value.id === id));
+                identifiers[objIndex] = id;
+            }
 
 
             if (Object.keys(allNodes).length === totalNodes) {
@@ -306,6 +306,28 @@ class Main extends React.Component {
 
         return <body className={'bg-dark'}>
         <div className={'main-content'}>
+            <Modal show={this.state.showModal} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Geo Map</Modal.Title>
+                </Modal.Header>
+                {this.state.geoCharts && this.state.showModal ?
+                    <Delay waitBeforeShow={200}>
+                        <Datamap
+                            fills={{
+                                defaultFill: '#152e4d',
+                                bubbleFill: '#ebebeb'
+                            }}
+                            responsive={true}
+                            bubbles={this.state.geoCharts}
+                        /> </Delay>
+                    : <Spinner/>}
+
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             <SkeletonTheme color="#202020" highlightColor="#444">
                 <Container fluid={true}>
                     <Row>
@@ -404,7 +426,7 @@ class Main extends React.Component {
                                             </span>
                                         </div>
                                         <div className="col-auto">
-                                            <span className="h2 fe fe-credit-card text-muted mb-0"></span>
+                                            <span className="h2 fe fe-clock text-muted mb-0"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -418,13 +440,13 @@ class Main extends React.Component {
                                             <h6 className="card-title text-uppercase text-muted mb-2">
                                                 Geo
                                             </h6>
-                                            <button className={'btn btn-sm btn-primary'}>lol</button>
-                                            <span className="h2 mb-0">
-                                                {this.state.ticketNumber || <Spinner/>}
-                                            </span>
+                                            <button className={'btn btn-sm text-stats p-0'} onClick={() => {
+                                                handleShow()
+                                            }}>View Map
+                                            </button>
                                         </div>
                                         <div className="col-auto">
-                                            <span className="h2 fe fe-credit-card text-muted mb-0"></span>
+                                            <span className="h2 fe fe-globe text-muted mb-0"></span>
                                         </div>
                                     </div>
                                 </div>
