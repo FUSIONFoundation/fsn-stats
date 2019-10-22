@@ -29,6 +29,7 @@ import TimeAgo from 'react-timeago';
 import ReactTooltip from 'react-tooltip'
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
 import Spinner from './Spinner';
+import AttentionWarning from './AttentionWarning'
 import {
     BarChart,
     ComposedChart,
@@ -82,6 +83,7 @@ class Main extends React.Component {
 
         let highestBlock = 0;
         let lastUpdatedBlock = 0;
+        let pendingTransactions = 0;
         const processCharts = (data) => {
             let chartData = JSON.parse(data.data[0].charts);
             // let highestBlock = Math.max(...chartData.height);
@@ -171,6 +173,7 @@ class Main extends React.Component {
                 if (data.number > highestBlock) {
                     highestBlock = data.number;
                     lastUpdatedBlock = data.received;
+                    pendingTransactions = allNodes[objIndex].stats.pending;
                 }
 
 
@@ -186,7 +189,8 @@ class Main extends React.Component {
                         highestBlock: highestBlock,
                         lastUpdatedBlock: lastUpdatedBlock,
                         ticketNumber: data.ticketNumber,
-                        lastUpdatedData: Date.now() + 5000
+                        lastUpdatedData: Date.now() + 5000,
+                        pendingTransactions: pendingTransactions
                     })
 
                     allNodes = [];
@@ -422,7 +426,7 @@ class Main extends React.Component {
                                                 Pending Transactions
                                             </h6>
                                             <span className="h2 mb-0">
-                                                {this.state.ticketNumber || <Spinner/>}
+                                                {this.state.pendingTransactions || <Spinner/>}
                                             </span>
                                         </div>
                                         <div className="col-auto">
@@ -481,22 +485,46 @@ class Main extends React.Component {
                             <tr>
                                 <th>Pin</th>
                                 <th>Active</th>
-                                <Tooltip title="Location of the node"><th>Location</th></Tooltip>
-                                <Tooltip title="Name of the node"><th>ID</th></Tooltip>
-                                <Tooltip title="Current version of efsn"><th>Type</th></Tooltip>
-                                <Tooltip title="The current block height the node is at"><th>Height</th></Tooltip>
-                                <Tooltip title="Time since last block"><th>Block Time</th></Tooltip>
-                                <Tooltip title="Add"><th>Tickets</th></Tooltip>
-                                <Tooltip title="Mining state"><th>Mining</th></Tooltip>
-                                <Tooltip title="Syncing state"><th>Syncing</th></Tooltip>
-                                <Tooltip title="Amount of peers"><th>Peers</th></Tooltip>
+                                <Tooltip title="Location of the node">
+                                    <th>Location</th>
+                                </Tooltip>
+                                <Tooltip title="Name of the node">
+                                    <th>ID</th>
+                                </Tooltip>
+                                <Tooltip title="Current version of efsn">
+                                    <th>Type</th>
+                                </Tooltip>
+                                <Tooltip title="The current block height the node is at">
+                                    <th>Height</th>
+                                </Tooltip>
+                                <Tooltip title="Time since last block">
+                                    <th>Block Time</th>
+                                </Tooltip>
+                                <Tooltip title="Pending Transactions in current block">
+                                    <th>Pending Txs</th>
+                                </Tooltip>
+                                <Tooltip title="Amount of tickets the node owns">
+                                    <th>Tickets</th>
+                                </Tooltip>
+                                <Tooltip title="Mining state">
+                                    <th>Mining</th>
+                                </Tooltip>
+                                <Tooltip title="Syncing state">
+                                    <th>Syncing</th>
+                                </Tooltip>
+                                <Tooltip title="Amount of peers">
+                                    <th>Peers</th>
+                                </Tooltip>
                                 <th>Uptime</th>
-                                <Tooltip title="Latency between stats server and the node"><th>Latency</th></Tooltip>
+                                <Tooltip title="Latency between stats server and the node">
+                                    <th>Latency</th>
+                                </Tooltip>
                             </tr>
                             </thead>
                             <tbody className={'text-center'}>
                             {this.state.nodeIdentifiers.map(((key, index) =>
-                                    pinnedNodes.includes(this.state.nodesList[index].id) ?
+                                    // pinnedNodes.includes(this.state.nodesList[index].id) ?
+                                false ?
                                         <tr>
                                             <td>
                                                 <a onClick={function () {
@@ -550,14 +578,20 @@ class Main extends React.Component {
                                                     code={this.state.nodesList[index].geo.country.toLowerCase()}
                                                     svg/> : '?'}</td>
                                                 <td>{this.state.nodesList[index].id}</td>
-                                                <td>{this.state.nodesList[index].info.node}</td>
+                                                <td>
+                                                    <Tooltip title={this.state.nodesList[index].info.node}>
+                                                        <span>Efsn</span>
+                                                    </Tooltip>
+                                                </td>
                                                 <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
-                                                <Spinner/>} <span
-                                                    className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
+                                                <Spinner/>}
+                                                <span className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
+                                                <AttentionWarning highestBlock={this.state.highestBlock || 0} currentBlock={this.state.nodesList[index].stats.block.number}/>
                                                 </td>
                                                 <td>{this.state.nodesList[index].stats.block.received ?
                                                     <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
                                                     <Spinner/>}</td>
+                                                <td>{this.state.nodesList[index].stats.pending}</td>
                                                 <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
                                                 <td>{this.state.nodesList[index].stats.mining ?
                                                     <span className="text-success">●</span> :

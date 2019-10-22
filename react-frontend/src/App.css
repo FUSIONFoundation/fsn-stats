@@ -78,6 +78,9 @@
 td {
     border-bottom: 1px solid rgba(50, 65, 86, 0.4) !important;
 }
+td:hover{
+    text-shadow: 0px 0px 1px gray !important
+}
 
 .hoverinfo {
     border: 1px solid #131927 !important;
