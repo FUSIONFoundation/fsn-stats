@@ -2,10 +2,10 @@ const { Pool } = require('pg')
 
 const pool = new Pool({
     user:       'postgres',
-    host:       process.env.SQLHOST,
+    host:       process.env.SQLHOST || 'localhost',
     port:       5432,
     database:   'myfusiondatabase',
-    password:   process.env.SQLPASS,
+    password:   process.env.SQLPASS || '',
     max:        5
 });
 
