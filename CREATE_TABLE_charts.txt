@@ -1,4 +1,4 @@
 CREATE TABLE charts (
     utctime      TIME with time zone,
-    charts       TEXT,
+    charts       TEXT
 );
