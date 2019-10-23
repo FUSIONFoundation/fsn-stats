@@ -53,6 +53,7 @@ class Main extends React.Component {
     constructor(props) {
         super(props);
 
+        let URL = 'http://stats.fusionnetwork.io:3002'
         let allNodes = [];
         let identifiers = [];
 
@@ -60,7 +61,7 @@ class Main extends React.Component {
         const getData = () => {
             console.log('Retrieving data')
             let countNodes = 0;
-            axios.get('http://93.89.252.58:3002/nodes').then(async function (data) {
+            axios.get(`${URL}/nodes`).then(async function (data) {
                 let nodeData = data.data;
                 for (let node in nodeData) {
                     if (nodeData[node].id.indexOf('★GoFSN.com|t.me/gofusion★') === -1) {
@@ -76,7 +77,7 @@ class Main extends React.Component {
 
         getData();
 
-        axios.get('http://93.89.252.58:3002/charts').then(function (data) {
+        axios.get(`${URL}/charts`).then(function (data) {
             processCharts(data);
         });
 
