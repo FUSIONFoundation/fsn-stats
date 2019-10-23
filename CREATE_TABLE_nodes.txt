@@ -1,8 +1,7 @@
-CREATE TABLE nodes (
-    id          TEXT,
-    utctime     TIME with time zone,
-    block       BIGINT,
-    stats       TEXT,
-    info        TEXT,
-    PRIMARY KEY id
+CREATE TABLE nodes ( 
+    id      TEXT PRIMARY KEY, 
+    utctime TIME with time zone, 
+    block   BIGINT, 
+    stats   TEXT, 
+    info    TEXT 
 );
