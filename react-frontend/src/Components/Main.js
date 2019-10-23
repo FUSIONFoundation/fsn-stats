@@ -519,47 +519,54 @@ class Main extends React.Component {
                                 </Tooltip>
                             </tr>
                             </thead>
+
                             <tbody className={'text-center'}>
-                            {this.state.nodeIdentifiers.map(((key, index) =>
-                                    // pinnedNodes.includes(this.state.nodesList[index].id) ?
-                                false ?
-                                        <tr>
-                                            <td>
-                                                <a onClick={function () {
+                            {
+                                this.state.nodeIdentifiers.map(((key, index) =>
+                                        pinnedNodes.includes(this.state.nodesList[index].id) && !this.state.hideNonPinned ?
+                                            <tr>
+                                                <td><a onClick={function () {
                                                     removePinnedNode(this.state.nodesList[index].id)
                                                 }.bind(this)}>
                                                     <span className="fe fe-minus-square text-muted mb-0"></span>
                                                 </a></td>
-                                            <td>{this.state.nodesList[index].stats.active ?
-                                                <span className="text-success">●</span> :
-                                                <span className="text-danger">●</span>}</td>
-                                            <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
-                                                code={this.state.nodesList[index].geo.country.toLowerCase()}
-                                                svg/> : '?'}</td>
-                                            <td>{this.state.nodesList[index].id}</td>
-                                            <td>{this.state.nodesList[index].info.node}</td>
-                                            <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
-                                            <Spinner/>} <span
-                                                className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
-                                            </td>
-                                            <td>{this.state.nodesList[index].stats.block.received ?
-                                                <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
-                                                <Spinner/>}</td>
-                                            <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
-                                            <td>{this.state.nodesList[index].stats.mining ?
-                                                <span className="text-success">●</span> :
-                                                <span className="text-danger">●</span>}</td>
-                                            <td>{this.state.nodesList[index].stats.syncing ?
-                                                <span className="text-success">●</span> :
-                                                <span className="text-danger">●</span>}</td>
-                                            <td>{this.state.nodesList[index].stats.peers}</td>
-                                            <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
-                                                             label={`${this.state.nodesList[index].stats.uptime}%`}/>
-                                            </td>
-                                            <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
-                                        </tr>
-                                        : ''
-                            ))}
+                                                <td>{this.state.nodesList[index].stats.active ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
+                                                    code={this.state.nodesList[index].geo.country.toLowerCase()}
+                                                    svg/> : '?'}</td>
+                                                <td>{this.state.nodesList[index].id}</td>
+                                                <td>
+                                                    <Tooltip title={this.state.nodesList[index].info.node}>
+                                                        <span>Efsn</span>
+                                                    </Tooltip>
+                                                </td>
+                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
+                                                <Spinner/>}
+                                                    <span className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
+                                                    <AttentionWarning highestBlock={this.state.highestBlock || 0} currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                </td>
+                                                <td>{this.state.nodesList[index].stats.block.received ?
+                                                    <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
+                                                    <Spinner/>}</td>
+                                                <td>{this.state.nodesList[index].stats.pending}</td>
+                                                <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
+                                                <td>{this.state.nodesList[index].stats.mining ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].stats.syncing ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].stats.peers}</td>
+                                                <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
+                                                                 label={`${this.state.nodesList[index].stats.uptime}%`}/>
+                                                </td>
+                                                <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
+                                            </tr>
+                                            : ''
+                                ))
+                            }
                             {
                                 this.state.nodeIdentifiers.map(((key, index) =>
                                         !pinnedNodes.includes(this.state.nodesList[index].id) && !this.state.hideNonPinned ?
