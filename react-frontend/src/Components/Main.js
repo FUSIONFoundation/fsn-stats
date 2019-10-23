@@ -238,7 +238,6 @@ class Main extends React.Component {
                 data.push(nodename);
                 localStorage.setItem('pinnedNodes', JSON.stringify(data));
             }
-            console.log(localStorage.getItem('pinnedNodes'));
             this.forceUpdate();
         }
 
@@ -246,7 +245,6 @@ class Main extends React.Component {
             let data = JSON.parse(localStorage.getItem('pinnedNodes'));
             const filteredItems = data.filter(item => item !== nodename);
             localStorage.setItem('pinnedNodes', JSON.stringify(filteredItems));
-            console.log(localStorage.getItem('pinnedNodes'))
             if (filteredItems.length === 0) {
                 this.setState({
                     hideNonPinned: false
@@ -302,7 +300,6 @@ class Main extends React.Component {
 
         let hideNonPinned = false;
         const setNonPinned = (state) => {
-            console.log(state);
             this.setState({
                 hideNonPinned: state
             });

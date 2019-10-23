@@ -4,7 +4,6 @@ import ToolTip from '@material-ui/core/Tooltip';
 class AttentionWarning extends React.Component {
     constructor(props){
         super(props);
-        console.log(props);
     }
 
     render(){
