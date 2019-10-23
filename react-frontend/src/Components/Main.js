@@ -198,7 +198,7 @@ class Main extends React.Component {
                     identifiers = [];
                     setTimeout(function () {
                         getData()
-                    }, 4000)
+                    }, 5000)
                 }
             }
         }
