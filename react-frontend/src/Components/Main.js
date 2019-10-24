@@ -465,7 +465,7 @@ class Main extends React.Component {
                                                 Pending Txs
                                             </h6>
                                             <span className="h2 mb-0">
-                                                {this.state.pendingTransactions || <Spinner/>}
+                                                {this.state.pendingTransactions || 0}
                                             </span>
                                         </div>
                                         <div className="col-auto">
