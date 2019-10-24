@@ -356,7 +356,7 @@ class Main extends React.Component {
                         <Col md={12}>
                             <div className="row">
                                 <div className="col-md-6">
-                                    <img src={FusionLogo} width="200px" alt=""/>
+                                    <img src={FusionLogo} width="200px" className={'p-2'} alt=""/>
                                 </div>
                             </div>
                         </Col>
@@ -364,10 +364,13 @@ class Main extends React.Component {
                             <div className="alert alert-primary mt-2">
                                 <div className="row">
                                     <div className="col-md-6">
+                                        <span className={'text-white'}>
                                         This monitor does not represent the entire state of the FUSION Network.
+                                        </span>
                                     </div>
                                     <div className="col-md-6 text-md-right">
-                                        <a className="text-white" href="https://fusion.org">Learn more about FUSION</a>
+                                        <a className="text-white" href="https://fusion.org">Learn more about FUSION <i
+                                            className="fe fe-external-link mb-0"/></a>
                                     </div>
                                 </div>
                             </div>
@@ -493,27 +496,48 @@ class Main extends React.Component {
                             </div>
                         </Col>
                     </Row>
-
-                    <Col md={12} className={'text-stats pt-2'}>
-                        <div className={'float-md-left'}>
-                            <span className="mr-3 overflow-auto">Active Nodes</span> {this.state.totalNodes ?
-                            <span className={'nodes-badge p-1'}>{this.state.totalNodes}</span> : <Spinner/>}
-                            {pinnedNodes.length > 0 ?
-                                <span className={'ml-3 overflow-auto'}>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ?
-                            <span className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
-                            {pinnedNodes.length > 0 ? <span className={'ml-3 overflow-auto'}>
+                    <div className="col-md-12">
+                        <div className="header">
+                            <div className="header-body p-2 border-0">
+                                <div className="row">
+                                    <div className="col-12">
+                                        <ul className="nav nav-tabs header-tabs text-stats">
+                                            <li className="nav-item">
+                                                <a href="#" className="nav-link text-center">
+                                                    Active Nodes {this.state.totalNodes ?
+                                                    <span className={'nodes-badge p-1'}>{this.state.totalNodes}</span> : <Spinner/>}
+                                                </a>
+                                            </li>
+                                            <li className="nav-item">
+                                                <a href="#" className="nav-link text-center">
+                                                    {pinnedNodes.length > 0 ?
+                                                        <span>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ?
+                                                    <span className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
+                                                </a>
+                                            </li>
+                                            <li className="nav-item">
+                                                <a href="#" className="nav-link text-center">
+                                                    {pinnedNodes.length > 0 ? <span className={'ml-3 overflow-auto'}>
                                 Hide non-pinned Nodes {!this.state.hideNonPinned ?
-                                <span className={'fe fe-square'} onClick={() => {
-                                    setNonPinned(true)
-                                }}></span> : <span className={'fe fe-x-square'} onClick={() => {
-                                    setNonPinned(false)
-                                }}></span>}
+                                                        <span className={'fe fe-square'} onClick={() => {
+                                                            setNonPinned(true)
+                                                        }}></span> : <span className={'fe fe-x-square'} onClick={() => {
+                                                            setNonPinned(false)
+                                                        }}></span>}
                             </span> : ''}
+                                                </a>
+                                            </li>
+                                            <li className="nav-item">
+                                                <a href="#" className="nav-link">
+                                                Updating In: <TimeAgo date={this.state.lastUpdatedData} formatter={formatter}/>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className={'float-md-right'}>
-                            Updating In: <TimeAgo date={this.state.lastUpdatedData} formatter={formatter}/>
-                        </div>
-                    </Col>
+                    </div>
 
                     <Col className={'table-responsive pt-3'} md={12}>
                         <Table className={'table table-sm table-nowrap card-table'} borderless variant="">
@@ -577,21 +601,33 @@ class Main extends React.Component {
                                                 <td>{this.state.nodesList[index].id}</td>
                                                 <td>
                                                     <Tooltip title={this.state.nodesList[index].info.node}>
-                                                        <span>Efsn</span>
+                                                        <span>{getVersionNumber(this.state.nodesList[index].info.node)}</span>
                                                     </Tooltip>
                                                 </td>
-                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
-                                                <Spinner/>}
+                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>
+
+                                                    {this.state.nodesList[index].stats.block.number ?
+                                                        <NumberFormat
+                                                            value={this.state.nodesList[index].stats.block.number}
+                                                            displayType={'text'} thousandSeparator={true}
+                                                            prefix={"# "}/>
+                                                        :
+                                                        <Spinner/>}
                                                     <span
-                                                        className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
-                                                    <AttentionWarning highestBlock={this.state.highestBlock || 0}
-                                                                      currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                        className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}
+                                                        <AttentionWarning highestBlock={this.state.highestBlock || 0}
+                                                                          currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                                      </span>
                                                 </td>
                                                 <td>{this.state.nodesList[index].stats.block.received ?
-                                                    <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
+                                                    <TimeAgo date={this.state.nodesList[index].stats.block.received}
+                                                             formatter={formatter}/> :
                                                     <Spinner/>}</td>
                                                 <td>{this.state.nodesList[index].stats.pending}</td>
-                                                <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
+                                                <Tooltip
+                                                    title={getTicketPercentage(this.state.ticketNumber, this.state.nodesList[index].stats.myTicketNumber)}>
+                                                    <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
+                                                </Tooltip>
                                                 <td>{this.state.nodesList[index].stats.mining ?
                                                     <span className="text-success">●</span> :
                                                     <span className="text-danger">●</span>}</td>
