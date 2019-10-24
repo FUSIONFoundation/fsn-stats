@@ -28,9 +28,10 @@ import Countdown from 'react-countdown-now';
 import Skeleton, {SkeletonTheme} from 'react-loading-skeleton';
 import TimeAgo from 'react-timeago';
 import ReactTooltip from 'react-tooltip'
+import frenchStrings from './timeAgo/customStrings'
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
 import Spinner from './Spinner';
-import AttentionWarning from './AttentionWarning'
+import AttentionWarning from './AttentionWarning';
 import {
     BarChart,
     ComposedChart,
@@ -54,7 +55,7 @@ class Main extends React.Component {
     constructor(props) {
         super(props);
 
-        let URL = 'http://stats.fusionnetwork.io:3002'
+        let URL = 'http://stats.fusionnetwork.io:3002';
         let allNodes = [];
         let identifiers = [];
 
@@ -325,6 +326,8 @@ class Main extends React.Component {
             }
         }
 
+        const formatter = buildFormatter(frenchStrings);
+
         return <body className={'bg-dark'}>
         <div className={'main-content'}>
             <Modal show={this.state.showModal} onHide={handleClose}>
@@ -396,7 +399,7 @@ class Main extends React.Component {
                                             </h6>
                                             <span className="h2 mb-0">
                                                 {this.state.lastUpdatedBlock ?
-                                                    <TimeAgo date={this.state.lastUpdatedBlock}/> : <Spinner/>}
+                                                    <TimeAgo date={this.state.lastUpdatedBlock} formatter={formatter}/> : <Spinner/>}
                                             </span>
                                         </div>
                                         <div className="col-auto">
