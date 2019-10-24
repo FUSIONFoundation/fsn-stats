@@ -9,7 +9,7 @@ class Populate  {
         //this.nodeUpdateDb = nodeUpdateDb;
     }
 
-    
+
     nodeGetDb(id) {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
@@ -33,14 +33,14 @@ class Populate  {
                         })
                         .catch(err => {
                              client.release();
-                             console.error(`Query SELECT node: Postgres failed`);
+                             console.error(`Query SELECT node: FAIL ${err}`);
                              reject(err);
                         });
                 }
             });
         });
     }
-    
+
 
     nodePostDb(record) {
         return new Promise(function(resolve, reject) {
@@ -68,7 +68,7 @@ class Populate  {
                     })
                     .catch(err => {
                         client.release();
-                        console.error(`Query INSERT INTO node: Postgres failed`);
+                        console.error(`Query INSERT INTO node: FAIL ${err}`);
                         reject(err);
                         return;
                     });
@@ -76,7 +76,7 @@ class Populate  {
             });
         });
     }
-    
+
     nodeUpdateDb(record) {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
@@ -91,7 +91,7 @@ class Populate  {
                     record[1] = record[1].replace('Z','');
                     record[1] = record[1].replace('.0','+');
                     //console.log(record[1]);
-                    const query = 
+                    const query =
                          `UPDATE nodes SET utctime     = '${record[1]}', block = ${record[2]}, stats = '${record[3]}', info = '${record[4]}' WHERE id = '${record[0]}'`;
                     //console.log(query);
                     client.query(query)
@@ -103,7 +103,7 @@ class Populate  {
                         })
                         .catch(err => {
                              client.release();
-                             console.error(`Query UPDATE node: Postgres failed`);
+                             console.error(`Query UPDATE node: FAIL ${err}`);
                              reject(err);
                              return;
                         });
@@ -111,11 +111,11 @@ class Populate  {
             });
         });
     }
-    
-    
-    
-    
-      
+
+
+
+
+
     nodeDeleteDb(id) {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
@@ -133,14 +133,14 @@ class Populate  {
                         })
                         .catch(err => {
                              client.release();
-                             console.error(`Query DELETE node: Postgres failed`);
+                             console.error(`Query DELETE node: FAIL ${err}`);
                              reject(err);
                         });
                 }
             });
         });
     }
-    
+
     nodeDeleteOldNodes(olderThanHours) {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
@@ -159,14 +159,14 @@ class Populate  {
                         })
                         .catch(err => {
                              client.release();
-                             console.error(`Query DELETE old nodes : Postgres failed`);
+                             console.error(`Query DELETE old nodes : FAIL ${err}`);
                              reject(err);
                         });
                 }
             });
         });
     }
-    
+
     blockPostDb(record) {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
@@ -177,7 +177,7 @@ class Populate  {
                 }
                 else {
                     let block_text ='blocks(utctime, blocks) VALUES($1, $2)';
-                    
+
                     let query = `DELETE FROM blocks`;
                     client.query(query)
                         .then(res => {
@@ -196,23 +196,23 @@ class Populate  {
                             })
                             .catch(err => {
                                 client.release();
-                                console.error(`Query INSERT INTO blocks: Postgres failed`);
+                                console.error(`Query INSERT INTO blocks: FAIL ${err}`);
                                 reject(err);
                                 return;
                             });
                         })
                         .catch(err => {
                              client.release();
-                             console.error(`Query DELETE blocks: Postgres failed`);
+                             console.error(`Query DELETE blocks:  FAIL ${err}`);
                              reject(err);
                         });
-                        
-                            
+
+
                 }
             });
         });
     }
-    
+
     chartPostDb(record) {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
@@ -222,13 +222,13 @@ class Populate  {
                     reject(err);
                 }
                 else {
-                    
+
                     let query = `DELETE FROM charts`;
                     client.query(query)
                     .then(res => {
                         //console.log('Overwriting old block database');
                         let chart_text ='charts(utctime, charts) VALUES($1, $2)';
-                        
+
                         query = {
                             text: `INSERT INTO ${chart_text}`,
                             values: record
@@ -243,25 +243,25 @@ class Populate  {
                         })
                         .catch(err => {
                             client.release();
-                            console.error(`Query INSERT INTO charts: Postgres failed`);
+                            console.error(`Query INSERT INTO charts: FAIL ${err}`);
                             reject(err);
                             return;
                         });
                     })
                     .catch(err => {
                         client.release();
-                        console.error(`Query DELETE charts: Postgres failed`);
+                        console.error(`Query DELETE charts:  FAIL ${err}`);
                         reject(err);
                     })
-                        
-                            
-                        
+
+
+
                 }
-                
+
             })
         });
     }
-    
+
 }
 
 module.exports = Populate;

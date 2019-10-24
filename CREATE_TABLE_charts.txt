@@ -1,4 +1,1 @@
-CREATE TABLE charts (
-    utctime      TIME with time zone,
-    charts       TEXT
-);
+CREATE TABLE charts ( utctime TEXT, charts TEXT );
