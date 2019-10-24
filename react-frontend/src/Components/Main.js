@@ -28,7 +28,7 @@ import Countdown from 'react-countdown-now';
 import Skeleton, {SkeletonTheme} from 'react-loading-skeleton';
 import TimeAgo from 'react-timeago';
 import ReactTooltip from 'react-tooltip'
-import frenchStrings from './timeAgo/customStrings'
+import customStrings from './timeAgo/customStrings'
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
 import Spinner from './Spinner';
 import AttentionWarning from './AttentionWarning';
@@ -47,9 +47,7 @@ import {
 import FontAwesome from 'react-loading-skeleton';
 import * as Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-
-let W3CWebSocket = require('websocket').w3cwebsocket;
-
+import FusionLogo from '../img/Fusion_White.svg';
 
 class Main extends React.Component {
     constructor(props) {
@@ -317,7 +315,7 @@ class Main extends React.Component {
 
         const getTicketPercentage = (totalTickets, nodeTicket) => {
             if (totalTickets && nodeTicket) {
-                if(nodeTicket === 0){
+                if (nodeTicket === 0) {
                     return '0% of all tickets';
                 } else {
                     let o = totalTickets / 100;
@@ -326,7 +324,7 @@ class Main extends React.Component {
             }
         }
 
-        const formatter = buildFormatter(frenchStrings);
+        const formatter = buildFormatter(customStrings);
 
         return <body className={'bg-dark'}>
         <div className={'main-content'}>
@@ -356,12 +354,19 @@ class Main extends React.Component {
                 <Container fluid={true}>
                     <Row>
                         <Col md={12}>
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <img src={FusionLogo} width="200px" alt=""/>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col md={12}>
                             <div className="alert alert-primary mt-2">
                                 <div className="row">
-                                    <div className="col-6">
-                                        This monitor does not represent the entire state of the FUSION Network
+                                    <div className="col-md-6">
+                                        This monitor does not represent the entire state of the FUSION Network.
                                     </div>
-                                    <div className="col-6 text-right">
+                                    <div className="col-md-6 text-md-right">
                                         <a className="text-white" href="https://fusion.org">Learn more about FUSION</a>
                                     </div>
                                 </div>
@@ -399,7 +404,8 @@ class Main extends React.Component {
                                             </h6>
                                             <span className="h2 mb-0">
                                                 {this.state.lastUpdatedBlock ?
-                                                    <TimeAgo date={this.state.lastUpdatedBlock} formatter={formatter}/> : <Spinner/>}
+                                                    <TimeAgo date={this.state.lastUpdatedBlock}
+                                                             formatter={formatter}/> : <Spinner/>}
                                             </span>
                                         </div>
                                         <div className="col-auto">
@@ -453,7 +459,7 @@ class Main extends React.Component {
                                     <div className="row align-items-center">
                                         <div className="col">
                                             <h6 className="card-title text-uppercase text-muted mb-2">
-                                                Pending Transactions
+                                                Pending Txs
                                             </h6>
                                             <span className="h2 mb-0">
                                                 {this.state.pendingTransactions || <Spinner/>}
@@ -490,12 +496,12 @@ class Main extends React.Component {
 
                     <Col md={12} className={'text-stats pt-2'}>
                         <div className={'float-md-left'}>
-                            <span className={'mr-3'}>Active Nodes</span> {this.state.totalNodes ?
+                            <span className="mr-3 overflow-auto">Active Nodes</span> {this.state.totalNodes ?
                             <span className={'nodes-badge p-1'}>{this.state.totalNodes}</span> : <Spinner/>}
                             {pinnedNodes.length > 0 ?
-                                <span className={'ml-3'}>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ?
+                                <span className={'ml-3 overflow-auto'}>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ?
                             <span className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
-                            {pinnedNodes.length > 0 ? <span className={'ml-3'}>
+                            {pinnedNodes.length > 0 ? <span className={'ml-3 overflow-auto'}>
                                 Hide non-pinned Nodes {!this.state.hideNonPinned ?
                                 <span className={'fe fe-square'} onClick={() => {
                                     setNonPinned(true)
@@ -505,7 +511,7 @@ class Main extends React.Component {
                             </span> : ''}
                         </div>
                         <div className={'float-md-right'}>
-                            Updating In: <TimeAgo date={this.state.lastUpdatedData}/>
+                            Updating In: <TimeAgo date={this.state.lastUpdatedData} formatter={formatter}/>
                         </div>
                     </Col>
 
@@ -638,7 +644,8 @@ class Main extends React.Component {
                                                                       </span>
                                                 </td>
                                                 <td>{this.state.nodesList[index].stats.block.received ?
-                                                    <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
+                                                    <TimeAgo date={this.state.nodesList[index].stats.block.received}
+                                                             formatter={formatter}/> :
                                                     <Spinner/>}</td>
                                                 <td>{this.state.nodesList[index].stats.pending}</td>
                                                 <Tooltip
