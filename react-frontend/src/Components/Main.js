@@ -343,7 +343,14 @@ class Main extends React.Component {
                     <Row>
                         <Col md={12}>
                             <div className="alert alert-primary mt-2">
-                                Work in progress!
+                                <div className="row">
+                                <div className="col-6">
+                                    This monitor does not represent the entire state of the FUSION Network
+                                </div>
+                                <div className="col-6 text-right">
+                                    <a className="text-white" href="https://fusion.org">Learn more about FUSION</a>
+                                </div>
+                                </div>
                             </div>
                         </Col>
                         <Col md={2}>
