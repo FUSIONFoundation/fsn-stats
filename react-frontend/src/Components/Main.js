@@ -505,7 +505,7 @@ class Main extends React.Component {
                                             <li className="nav-item">
                                                 <a href="#" className="nav-link text-center">
                                                     Active Nodes {this.state.totalNodes ?
-                                                    <span className={'nodes-badge p-1'}>{this.state.totalNodes}</span> : <Spinner/>}
+                                                    <span className={'nodes-badge p-1'}>{this.state.totalNodes}/{this.state.totalNodes}</span> : <Spinner/>}
                                                 </a>
                                             </li>
                                             <li className="nav-item">
