@@ -17,6 +17,7 @@ import {
     FormControl
 } from 'react-bootstrap'
 import Fade from 'react-reveal/Fade';
+import NumberFormat from 'react-number-format';
 import Tooltip from '@material-ui/core/Tooltip';
 import Delay from './Delay';
 import axios from 'axios';
@@ -78,7 +79,7 @@ class Main extends React.Component {
         getData();
 
         axios.get(`${URL}/charts`).then(function (data) {
-            if ( data.data.length > 0 ) processCharts(data);
+            if (data.data.length > 0) processCharts(data);
         });
 
 
@@ -270,7 +271,8 @@ class Main extends React.Component {
                 } else if ((highestBlock - nodeBlock) > 1) {
                     return 'text-danger';
                 }
-            };
+            }
+            ;
         }
 
         const latencyClass = (latency) => {
@@ -353,7 +355,10 @@ class Main extends React.Component {
                                                 Last Block
                                             </h6>
                                             <span className="h2 mb-0">
-                                                {this.state.highestBlock || <Spinner/>}
+                                                {this.state.highestBlock ?
+                                                    <NumberFormat value={this.state.highestBlock} displayType={'text'}
+                                                                  thousandSeparator={true} prefix={"# "}/>
+                                                    : <Spinner/>}
                                             </span>
                                         </div>
                                         <div className="col-auto">
@@ -596,12 +601,20 @@ class Main extends React.Component {
                                                         <span>{getVersionNumber(this.state.nodesList[index].info.node)}</span>
                                                     </Tooltip>
                                                 </td>
-                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
-                                                <Spinner/>}
+                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>
+
+                                                    {this.state.nodesList[index].stats.block.number ?
+                                                        <NumberFormat
+                                                            value={this.state.nodesList[index].stats.block.number}
+                                                            displayType={'text'} thousandSeparator={true}
+                                                            prefix={"# "}/>
+                                                        :
+                                                        <Spinner/>}
                                                     <span
-                                                        className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
-                                                    <AttentionWarning highestBlock={this.state.highestBlock || 0}
-                                                                      currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                        className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}
+                                                        <AttentionWarning highestBlock={this.state.highestBlock || 0}
+                                                                          currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                                      </span>
                                                 </td>
                                                 <td>{this.state.nodesList[index].stats.block.received ?
                                                     <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
