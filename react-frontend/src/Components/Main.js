@@ -78,7 +78,7 @@ class Main extends React.Component {
         getData();
 
         axios.get(`${URL}/charts`).then(function (data) {
-            processCharts(data);
+            if ( data.data.length > 0 ) processCharts(data);
         });
 
 
@@ -255,6 +255,14 @@ class Main extends React.Component {
             this.forceUpdate();
         }
 
+        const getVersionNumber = (string) => {
+            let vIndex = string.indexOf('v');
+            let minV = string.substr(vIndex + 1, string.length);
+            let dashIndex = minV.indexOf('-');
+            return minV.substr(0, dashIndex);
+        }
+
+
         const blockClass = (nodeBlock, highestBlock) => {
             if (highestBlock && nodeBlock) {
                 if ((highestBlock - nodeBlock) === 1) {
@@ -262,12 +270,10 @@ class Main extends React.Component {
                 } else if ((highestBlock - nodeBlock) > 1) {
                     return 'text-danger';
                 }
-            }
-            ;
+            };
         }
 
         const latencyClass = (latency) => {
-
             if (latency > 100) {
                 return 'text-warn'
             } else if (latency >= 1000) {
@@ -293,7 +299,7 @@ class Main extends React.Component {
                 showModal: state,
                 showDetailsId: id
             });
-        }
+        };
 
         const handleClose = () => setShow(false);
         const handleShow = () => setShow(true);
@@ -544,8 +550,10 @@ class Main extends React.Component {
                                                 </td>
                                                 <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
                                                 <Spinner/>}
-                                                    <span className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
-                                                    <AttentionWarning highestBlock={this.state.highestBlock || 0} currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                    <span
+                                                        className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
+                                                    <AttentionWarning highestBlock={this.state.highestBlock || 0}
+                                                                      currentBlock={this.state.nodesList[index].stats.block.number}/>
                                                 </td>
                                                 <td>{this.state.nodesList[index].stats.block.received ?
                                                     <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
@@ -585,13 +593,15 @@ class Main extends React.Component {
                                                 <td>{this.state.nodesList[index].id}</td>
                                                 <td>
                                                     <Tooltip title={this.state.nodesList[index].info.node}>
-                                                        <span>Efsn</span>
+                                                        <span>{getVersionNumber(this.state.nodesList[index].info.node)}</span>
                                                     </Tooltip>
                                                 </td>
                                                 <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>{this.state.nodesList[index].stats.block.number ||
                                                 <Spinner/>}
-                                                <span className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
-                                                <AttentionWarning highestBlock={this.state.highestBlock || 0} currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                    <span
+                                                        className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}</span>
+                                                    <AttentionWarning highestBlock={this.state.highestBlock || 0}
+                                                                      currentBlock={this.state.nodesList[index].stats.block.number}/>
                                                 </td>
                                                 <td>{this.state.nodesList[index].stats.block.received ?
                                                     <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
