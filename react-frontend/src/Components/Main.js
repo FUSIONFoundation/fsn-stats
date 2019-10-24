@@ -314,6 +314,17 @@ class Main extends React.Component {
             this.forceUpdate();
         };
 
+        const getTicketPercentage = (totalTickets, nodeTicket) => {
+            if (totalTickets && nodeTicket) {
+                if(nodeTicket === 0){
+                    return '0% of all tickets';
+                } else {
+                    let o = totalTickets / 100;
+                    return `${(nodeTicket / o).toFixed(2)}% of all tickets`;
+                }
+            }
+        }
+
         return <body className={'bg-dark'}>
         <div className={'main-content'}>
             <Modal show={this.state.showModal} onHide={handleClose}>
@@ -344,12 +355,12 @@ class Main extends React.Component {
                         <Col md={12}>
                             <div className="alert alert-primary mt-2">
                                 <div className="row">
-                                <div className="col-6">
-                                    This monitor does not represent the entire state of the FUSION Network
-                                </div>
-                                <div className="col-6 text-right">
-                                    <a className="text-white" href="https://fusion.org">Learn more about FUSION</a>
-                                </div>
+                                    <div className="col-6">
+                                        This monitor does not represent the entire state of the FUSION Network
+                                    </div>
+                                    <div className="col-6 text-right">
+                                        <a className="text-white" href="https://fusion.org">Learn more about FUSION</a>
+                                    </div>
                                 </div>
                             </div>
                         </Col>
@@ -627,7 +638,10 @@ class Main extends React.Component {
                                                     <TimeAgo date={this.state.nodesList[index].stats.block.received}/> :
                                                     <Spinner/>}</td>
                                                 <td>{this.state.nodesList[index].stats.pending}</td>
-                                                <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
+                                                <Tooltip
+                                                    title={getTicketPercentage(this.state.ticketNumber, this.state.nodesList[index].stats.myTicketNumber)}>
+                                                    <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
+                                                </Tooltip>
                                                 <td>{this.state.nodesList[index].stats.mining ?
                                                     <span className="text-success">●</span> :
                                                     <span className="text-danger">●</span>}</td>
