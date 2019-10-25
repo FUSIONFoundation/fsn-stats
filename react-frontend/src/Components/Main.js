@@ -353,6 +353,27 @@ class Main extends React.Component {
                 </Modal.Footer>
             </Modal>
             <SkeletonTheme color="#202020" highlightColor="#444">
+                <nav className="navbar navbar-expand-lg navbar-light shadow">
+                    <div className="container-fluid">
+                        <div className="col-auto">
+                            <ul className="navbar-nav">
+                                <li className="nav-item">
+                                    <a className="nav-link" href="#">
+                                        <i className="fe fe-github"/>
+                                        Report an issue
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div className="col-auto">
+                            <ul className="navbar-nav">
+                                <li className="nav-item">
+                                    <a className="nav-link" href="#"><i className="fe fe-globe"/> powered by fusion.org</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
                 <Container fluid={true}>
                     <Row>
                         <Col md={12}>
@@ -582,7 +603,7 @@ class Main extends React.Component {
                                 <tbody className={'text-center'}>
                                 {
                                     this.state.nodeIdentifiers.map(((key, index) =>
-                                            pinnedNodes.includes(this.state.nodesList[index].id) && !this.state.hideNonPinned ?
+                                            pinnedNodes.includes(this.state.nodesList[index].id)?
                                                 <tr>
                                                     <td><a onClick={function () {
                                                         removePinnedNode(this.state.nodesList[index].id)
