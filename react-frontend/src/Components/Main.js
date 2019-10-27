@@ -352,404 +352,354 @@ class Main extends React.Component {
                     </Button>
                 </Modal.Footer>
             </Modal>
-            <SkeletonTheme color="#202020" highlightColor="#444">
-                <nav className="navbar navbar-expand-lg navbar-light shadow">
-                    <div className="container-fluid">
-                        <div className="col-auto">
-                            <ul className="navbar-nav">
-                                <li className="nav-item">
-                                    <a className="nav-link" href="#">
-                                        <i className="fe fe-github"/>
-                                        Report an issue
-                                    </a>
-                                </li>
-                            </ul>
+            <Container fluid={true}>
+                <Row>
+                    <Col md={12}>
+                        <div className="row">
+                            <div className="col-md-6">
+                                <img src={FusionLogo} width="200px" className={'p-2'} alt=""/>
+                            </div>
                         </div>
-                        <div className="col-auto">
-                            <ul className="navbar-nav">
-                                <li className="nav-item">
-                                    <a className="nav-link" href="#"><i className="fe fe-globe"/> powered by fusion.org</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </nav>
-                <Container fluid={true}>
-                    <Row>
-                        <Col md={12}>
+                    </Col>
+                    <Col md={12}>
+                        <div className="alert alert-primary mt-2">
                             <div className="row">
                                 <div className="col-md-6">
-                                    <img src={FusionLogo} width="200px" className={'p-2'} alt=""/>
-                                </div>
-                            </div>
-                        </Col>
-                        <Col md={12}>
-                            <div className="alert alert-primary mt-2">
-                                <div className="row">
-                                    <div className="col-md-6">
                                         <span className={'text-white'}>
                                         This monitor does not represent the entire state of the FUSION Network.
                                         </span>
-                                    </div>
-                                    <div className="col-md-6 text-md-right">
-                                        <a className="text-white" href="https://fusion.org">Learn more about FUSION <i
-                                            className="fe fe-external-link mb-0"/></a>
-                                    </div>
+                                </div>
+                                <div className="col-md-6 text-md-right">
+                                    <a className="text-white" href="https://fusion.org">Learn more about FUSION <i
+                                        className="fe fe-external-link mb-0"/></a>
                                 </div>
                             </div>
-                        </Col>
-                        <Col md={2}>
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="row align-items-center">
-                                        <div className="col">
-                                            <h6 className="card-title text-uppercase text-muted mb-2">
-                                                Last Block
-                                            </h6>
-                                            <span className="h2 mb-0">
+                        </div>
+                    </Col>
+                    <Col md={2}>
+                        <div className="card">
+                            <div className="card-body">
+                                <div className="row align-items-center">
+                                    <div className="col">
+                                        <h6 className="card-title text-uppercase text-muted mb-2">
+                                            Last Block
+                                        </h6>
+                                        <span className="h2 mb-0">
                                                 {this.state.highestBlock ?
                                                     <NumberFormat value={this.state.highestBlock} displayType={'text'}
                                                                   thousandSeparator={true} prefix={"# "}/>
                                                     : <Spinner/>}
                                             </span>
-                                        </div>
-                                        <div className="col-auto">
-                                            <span className="h2 fe fe-box text-muted mb-0"></span>
-                                        </div>
+                                    </div>
+                                    <div className="col-auto">
+                                        <span className="h2 fe fe-box text-muted mb-0"></span>
                                     </div>
                                 </div>
                             </div>
-                        </Col>
-                        <Col md={2}>
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="row align-items-center">
-                                        <div className="col">
-                                            <h6 className="card-title text-uppercase text-muted mb-2">
-                                                Block Time Ago
-                                            </h6>
-                                            <span className="h2 mb-0">
+                        </div>
+                    </Col>
+                    <Col md={2}>
+                        <div className="card">
+                            <div className="card-body">
+                                <div className="row align-items-center">
+                                    <div className="col">
+                                        <h6 className="card-title text-uppercase text-muted mb-2">
+                                            Block Time Ago
+                                        </h6>
+                                        <span className="h2 mb-0">
                                                 {this.state.lastUpdatedBlock ?
                                                     <TimeAgo date={this.state.lastUpdatedBlock}
                                                              formatter={formatter}/> : <Spinner/>}
                                             </span>
-                                        </div>
-                                        <div className="col-auto">
-                                            <span className="h2 fe fe-clock text-muted mb-0"></span>
-                                        </div>
+                                    </div>
+                                    <div className="col-auto">
+                                        <span className="h2 fe fe-clock text-muted mb-0"></span>
                                     </div>
                                 </div>
-                            </div>
-                        </Col>
-                        <Col md={2}>
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="row align-items-center">
-                                        <div className="col">
-                                            <h6 className="card-title text-uppercase text-muted mb-2">
-                                                Average Block Time
-                                            </h6>
-                                            <span className="h2 mb-0">
-                                                {this.state.avgBlockTime || <Spinner/>}
-                                            </span>
-                                        </div>
-                                        <div className="col-auto text-center">
-                                            <span className="h2 fe fe-briefcase text-muted mb-0"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </Col>
-                        <Col md={2}>
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="row align-items-center">
-                                        <div className="col">
-                                            <h6 className="card-title text-uppercase text-muted mb-2">
-                                                Tickets
-                                            </h6>
-                                            <span className="h2 mb-0">
-                                                {this.state.ticketNumber || <Spinner/>}
-                                            </span>
-                                        </div>
-                                        <div className="col-auto">
-                                            <span className="h2 fe fe-credit-card text-muted mb-0"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </Col>
-                        <Col md={2}>
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="row align-items-center">
-                                        <div className="col">
-                                            <h6 className="card-title text-uppercase text-muted mb-2">
-                                                Pending Txs
-                                            </h6>
-                                            <span className="h2 mb-0">
-                                                {this.state.pendingTransactions || 0}
-                                            </span>
-                                        </div>
-                                        <div className="col-auto">
-                                            <span className="h2 fe fe-clock text-muted mb-0"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </Col>
-                        <Col md={2}>
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="row align-items-center">
-                                        <div className="col">
-                                            <h6 className="card-title text-uppercase text-muted mb-2">
-                                                Geo
-                                            </h6>
-                                            <button className={'btn btn-sm text-stats p-0'} onClick={() => {
-                                                handleShow()
-                                            }}>View Map
-                                            </button>
-                                        </div>
-                                        <div className="col-auto">
-                                            <span className="h2 fe fe-globe text-muted mb-0"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </Col>
-                    </Row>
-                    <div className="col-md-12">
-                        <ul className="nav nav-tabs header-tabs text-stats">
-                            <li className="nav-item">
-                                <a href="#" className="nav-link text-center">
-                                    Active Nodes {this.state.totalNodes ?
-                                    <span
-                                        className={'nodes-badge p-1'}>{this.state.totalNodes}/{this.state.totalNodes}</span> :
-                                    <Spinner/>}
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a href="#" className="nav-link text-center">
-                                    {pinnedNodes.length > 0 ?
-                                        <span>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ?
-                                    <span
-                                        className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a href="#" className="nav-link text-center">
-                                    {pinnedNodes.length > 0 ? <span className={'ml-3 overflow-auto'}>
-                                Hide non-pinned Nodes {!this.state.hideNonPinned ?
-                                        <span className={'fe fe-square'} onClick={() => {
-                                            setNonPinned(true)
-                                        }}></span> : <span className={'fe fe-x-square'} onClick={() => {
-                                            setNonPinned(false)
-                                        }}></span>}
-                            </span> : ''}
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a href="#" className="nav-link">
-                                    Updating In: <TimeAgo date={this.state.lastUpdatedData}
-                                                          formatter={formatter}/>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <Scrollbars style={{width: '100%', height: '60vh'}}>
-                        <Col className={'table-responsive pt-3'} md={12}>
-                            <Table className={'table table-sm table-nowrap card-table'} borderless variant="">
-                                <thead className={'text-center text-muted'}>
-                                <tr>
-                                    <th>Pin</th>
-                                    <th>Active</th>
-                                    <Tooltip title="Location of the node">
-                                        <th>Location</th>
-                                    </Tooltip>
-                                    <Tooltip title="Name of the node">
-                                        <th>ID</th>
-                                    </Tooltip>
-                                    <Tooltip title="Current version of efsn">
-                                        <th>Type</th>
-                                    </Tooltip>
-                                    <Tooltip title="The current block height the node is at">
-                                        <th>Height</th>
-                                    </Tooltip>
-                                    <Tooltip title="Time since last block">
-                                        <th>Block Time</th>
-                                    </Tooltip>
-                                    <Tooltip title="Pending Transactions in current block">
-                                        <th>Pending Txs</th>
-                                    </Tooltip>
-                                    <Tooltip title="Amount of tickets the node owns">
-                                        <th>Tickets</th>
-                                    </Tooltip>
-                                    <Tooltip title="Mining state">
-                                        <th>Mining</th>
-                                    </Tooltip>
-                                    <Tooltip title="Syncing state">
-                                        <th>Syncing</th>
-                                    </Tooltip>
-                                    <Tooltip title="Amount of peers">
-                                        <th>Peers</th>
-                                    </Tooltip>
-                                    <th>Uptime</th>
-                                    <Tooltip title="Latency between stats server and the node">
-                                        <th>Latency</th>
-                                    </Tooltip>
-                                </tr>
-                                </thead>
-                                <tbody className={'text-center'}>
-                                {
-                                    this.state.nodeIdentifiers.map(((key, index) =>
-                                            pinnedNodes.includes(this.state.nodesList[index].id)?
-                                                <tr>
-                                                    <td><a onClick={function () {
-                                                        removePinnedNode(this.state.nodesList[index].id)
-                                                    }.bind(this)}>
-                                                        <span className="fe fe-minus-square text-muted mb-0"></span>
-                                                    </a></td>
-                                                    <td>{this.state.nodesList[index].stats.active ?
-                                                        <span className="text-success">●</span> :
-                                                        <span className="text-danger">●</span>}</td>
-                                                    <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
-                                                        code={this.state.nodesList[index].geo.country.toLowerCase()}
-                                                        svg/> : '?'}</td>
-                                                    <td>{this.state.nodesList[index].id}</td>
-                                                    <td>
-                                                        <Tooltip title={this.state.nodesList[index].info.node}>
-                                                            <span>{getVersionNumber(this.state.nodesList[index].info.node)}</span>
-                                                        </Tooltip>
-                                                    </td>
-                                                    <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>
-
-                                                        {this.state.nodesList[index].stats.block.number ?
-                                                            <NumberFormat
-                                                                value={this.state.nodesList[index].stats.block.number}
-                                                                displayType={'text'} thousandSeparator={true}
-                                                                prefix={"# "}/>
-                                                            :
-                                                            <Spinner/>}
-                                                        <span
-                                                            className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}
-                                                            <AttentionWarning
-                                                                highestBlock={this.state.highestBlock || 0}
-                                                                currentBlock={this.state.nodesList[index].stats.block.number}/>
-                                                                      </span>
-                                                    </td>
-                                                    <td>{this.state.nodesList[index].stats.block.received ?
-                                                        <TimeAgo date={this.state.nodesList[index].stats.block.received}
-                                                                 formatter={formatter}/> :
-                                                        <Spinner/>}</td>
-                                                    <td>{this.state.nodesList[index].stats.pending}</td>
-                                                    <Tooltip
-                                                        title={getTicketPercentage(this.state.ticketNumber, this.state.nodesList[index].stats.myTicketNumber)}>
-                                                        <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
-                                                    </Tooltip>
-                                                    <td>{this.state.nodesList[index].stats.mining ?
-                                                        <span className="text-success">●</span> :
-                                                        <span className="text-danger">●</span>}</td>
-                                                    <td>{this.state.nodesList[index].stats.syncing ?
-                                                        <span className="text-success">●</span> :
-                                                        <span className="text-danger">●</span>}</td>
-                                                    <td>{this.state.nodesList[index].stats.peers}</td>
-                                                    <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
-                                                                     label={`${this.state.nodesList[index].stats.uptime}%`}/>
-                                                    </td>
-                                                    <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
-                                                </tr>
-                                                : ''
-                                    ))
-                                }
-                                {
-                                    this.state.nodeIdentifiers.map(((key, index) =>
-                                            !pinnedNodes.includes(this.state.nodesList[index].id) && !this.state.hideNonPinned ?
-                                                <tr>
-                                                    <td><a onClick={function () {
-                                                        setPinnedNode(this.state.nodesList[index].id)
-                                                    }.bind(this)}>
-                                                        <span className="fe fe-square text-muted mb-0"></span>
-                                                    </a></td>
-                                                    <td>{this.state.nodesList[index].stats.active ?
-                                                        <span className="text-success">●</span> :
-                                                        <span className="text-danger">●</span>}</td>
-                                                    <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
-                                                        code={this.state.nodesList[index].geo.country.toLowerCase()}
-                                                        svg/> : '?'}</td>
-                                                    <td>{this.state.nodesList[index].id}</td>
-                                                    <td>
-                                                        <Tooltip title={this.state.nodesList[index].info.node}>
-                                                            <span>{getVersionNumber(this.state.nodesList[index].info.node)}</span>
-                                                        </Tooltip>
-                                                    </td>
-                                                    <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>
-
-                                                        {this.state.nodesList[index].stats.block.number ?
-                                                            <NumberFormat
-                                                                value={this.state.nodesList[index].stats.block.number}
-                                                                displayType={'text'} thousandSeparator={true}
-                                                                prefix={"# "}/>
-                                                            :
-                                                            <Spinner/>}
-                                                        <span
-                                                            className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}
-                                                            <AttentionWarning
-                                                                highestBlock={this.state.highestBlock || 0}
-                                                                currentBlock={this.state.nodesList[index].stats.block.number}/>
-                                                                      </span>
-                                                    </td>
-                                                    <td>{this.state.nodesList[index].stats.block.received ?
-                                                        <TimeAgo date={this.state.nodesList[index].stats.block.received}
-                                                                 formatter={formatter}/> :
-                                                        <Spinner/>}</td>
-                                                    <td>{this.state.nodesList[index].stats.pending}</td>
-                                                    <Tooltip
-                                                        title={getTicketPercentage(this.state.ticketNumber, this.state.nodesList[index].stats.myTicketNumber)}>
-                                                        <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
-                                                    </Tooltip>
-                                                    <td>{this.state.nodesList[index].stats.mining ?
-                                                        <span className="text-success">●</span> :
-                                                        <span className="text-danger">●</span>}</td>
-                                                    <td>{this.state.nodesList[index].stats.syncing ?
-                                                        <span className="text-success">●</span> :
-                                                        <span className="text-danger">●</span>}</td>
-                                                    <td>{this.state.nodesList[index].stats.peers}</td>
-                                                    <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
-                                                                     label={`${this.state.nodesList[index].stats.uptime}%`}/>
-                                                    </td>
-                                                    <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
-                                                </tr>
-                                                : ''
-                                    ))
-                                }
-                                </tbody>
-                            </Table>
-                        </Col>
-                    </Scrollbars>
-                    <nav className="navbar navbar-expand-lg navbar-light fixed-bottom shadow">
-                        <div className="container-fluid">
-                            <div className="col-auto">
-                                <ul className="navbar-nav">
-                                    <li className="nav-item">
-                                        <a className="nav-link" href="#">
-                                            <i className="fe fe-github"/>
-                                            Report an issue
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div className="col-auto">
-                                <ul className="navbar-nav">
-                                    <li className="nav-item">
-                                        <a className="nav-link" href="#"><i className="fe fe-globe"/> powered by fusion.org</a>
-                                    </li>
-                                </ul>
                             </div>
                         </div>
-                    </nav>
-                </Container>
-            </SkeletonTheme>
+                    </Col>
+                    <Col md={2}>
+                        <div className="card">
+                            <div className="card-body">
+                                <div className="row align-items-center">
+                                    <div className="col">
+                                        <h6 className="card-title text-uppercase text-muted mb-2">
+                                            Average Block Time
+                                        </h6>
+                                        <span className="h2 mb-0">
+                                                {this.state.avgBlockTime || <Spinner/>}
+                                            </span>
+                                    </div>
+                                    <div className="col-auto text-center">
+                                        <span className="h2 fe fe-briefcase text-muted mb-0"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Col>
+                    <Col md={2}>
+                        <div className="card">
+                            <div className="card-body">
+                                <div className="row align-items-center">
+                                    <div className="col">
+                                        <h6 className="card-title text-uppercase text-muted mb-2">
+                                            Tickets
+                                        </h6>
+                                        <span className="h2 mb-0">
+                                                {this.state.ticketNumber || <Spinner/>}
+                                            </span>
+                                    </div>
+                                    <div className="col-auto">
+                                        <span className="h2 fe fe-credit-card text-muted mb-0"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Col>
+                    <Col md={2}>
+                        <div className="card">
+                            <div className="card-body">
+                                <div className="row align-items-center">
+                                    <div className="col">
+                                        <h6 className="card-title text-uppercase text-muted mb-2">
+                                            Pending Txs
+                                        </h6>
+                                        <span className="h2 mb-0">
+                                                {this.state.pendingTransactions || 0}
+                                            </span>
+                                    </div>
+                                    <div className="col-auto">
+                                        <span className="h2 fe fe-clock text-muted mb-0"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Col>
+                    <Col md={2}>
+                        <div className="card">
+                            <div className="card-body">
+                                <div className="row align-items-center">
+                                    <div className="col">
+                                        <h6 className="card-title text-uppercase text-muted mb-2">
+                                            Geo
+                                        </h6>
+                                        <button className={'btn btn-sm text-stats p-0'} onClick={() => {
+                                            handleShow()
+                                        }}>View Map
+                                        </button>
+                                    </div>
+                                    <div className="col-auto">
+                                        <span className="h2 fe fe-globe text-muted mb-0"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
+                <div className="col-md-12 pb-3 text-stats">
+                    <div className="row">
+                        <div className="mx-auto">
+                            Active Nodes {this.state.totalNodes ?
+                            <span
+                                className={'nodes-badge p-1'}>{this.state.totalNodes}/{this.state.totalNodes}</span> :
+                            <Spinner/>}
+                        </div>
+                        <div className="mx-auto">
+                            {pinnedNodes.length > 0 ?
+                                <span>Pinned Nodes</span> : ''} {pinnedNodes.length > 0 ?
+                            <span
+                                className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
+                        </div>
+                        <div className="mx-auto mt-sm-3">
+                            {pinnedNodes.length > 0 ? <span className={'ml-3 overflow-auto'}>
+                                Hide non-pinned Nodes {!this.state.hideNonPinned ?
+                                <span className={'fe fe-square'} onClick={() => {
+                                    setNonPinned(true)
+                                }}></span> : <span className={'fe fe-x-square'} onClick={() => {
+                                    setNonPinned(false)
+                                }}></span>}
+                            </span> : ''}
+                        </div>
+                        <div className="mx-auto mt-sm-3">
+                            Updating In: <TimeAgo date={this.state.lastUpdatedData}
+                                                  formatter={formatter}/>
+                        </div>
+                    </div>
+                </div>
+                <div className={'col-md-12'}>
+                    <div className={'table-responsive pt-3'}>
+                        <Table className={'table table-sm table-nowrap card-table'} borderless variant="">
+                            <thead className={'text-center text-muted'}>
+                            <tr>
+                                <th>Pin</th>
+                                <th>Active</th>
+                                <Tooltip title="Location of the node">
+                                    <th>Location</th>
+                                </Tooltip>
+                                <Tooltip title="Name of the node">
+                                    <th>ID</th>
+                                </Tooltip>
+                                <Tooltip title="Current version of efsn">
+                                    <th>Type</th>
+                                </Tooltip>
+                                <Tooltip title="The current block height the node is at">
+                                    <th>Height</th>
+                                </Tooltip>
+                                <Tooltip title="Time since last block">
+                                    <th>Block Time</th>
+                                </Tooltip>
+                                <Tooltip title="Pending Transactions in current block">
+                                    <th>Pending Txs</th>
+                                </Tooltip>
+                                <Tooltip title="Amount of tickets the node owns">
+                                    <th>Tickets</th>
+                                </Tooltip>
+                                <Tooltip title="Mining state">
+                                    <th>Mining</th>
+                                </Tooltip>
+                                <Tooltip title="Syncing state">
+                                    <th>Syncing</th>
+                                </Tooltip>
+                                <Tooltip title="Amount of peers">
+                                    <th>Peers</th>
+                                </Tooltip>
+                                <th>Uptime</th>
+                                <Tooltip title="Latency between stats server and the node">
+                                    <th>Latency</th>
+                                </Tooltip>
+                            </tr>
+                            </thead>
+                            <tbody className={'text-center'}>
+                            {
+                                this.state.nodeIdentifiers.map(((key, index) =>
+                                        pinnedNodes.includes(this.state.nodesList[index].id) ?
+                                            <tr>
+                                                <td><a onClick={function () {
+                                                    removePinnedNode(this.state.nodesList[index].id)
+                                                }.bind(this)}>
+                                                    <span className="fe fe-minus-square text-muted mb-0"></span>
+                                                </a></td>
+                                                <td>{this.state.nodesList[index].stats.active ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
+                                                    code={this.state.nodesList[index].geo.country.toLowerCase()}
+                                                    svg/> : '?'}</td>
+                                                <td>{this.state.nodesList[index].id}</td>
+                                                <td>
+                                                    <Tooltip title={this.state.nodesList[index].info.node}>
+                                                        <span>{getVersionNumber(this.state.nodesList[index].info.node)}</span>
+                                                    </Tooltip>
+                                                </td>
+                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>
+
+                                                    {this.state.nodesList[index].stats.block.number ?
+                                                        <NumberFormat
+                                                            value={this.state.nodesList[index].stats.block.number}
+                                                            displayType={'text'} thousandSeparator={true}
+                                                            prefix={"# "}/>
+                                                        :
+                                                        <Spinner/>}
+                                                    <span
+                                                        className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}
+                                                        <AttentionWarning
+                                                            highestBlock={this.state.highestBlock || 0}
+                                                            currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                                      </span>
+                                                </td>
+                                                <td>{this.state.nodesList[index].stats.block.received ?
+                                                    <TimeAgo
+                                                        date={this.state.nodesList[index].stats.block.received}
+                                                        formatter={formatter}/> :
+                                                    <Spinner/>}</td>
+                                                <td>{this.state.nodesList[index].stats.pending}</td>
+                                                <Tooltip
+                                                    title={getTicketPercentage(this.state.ticketNumber, this.state.nodesList[index].stats.myTicketNumber)}>
+                                                    <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
+                                                </Tooltip>
+                                                <td>{this.state.nodesList[index].stats.mining ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].stats.syncing ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].stats.peers}</td>
+                                                <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
+                                                                 label={`${this.state.nodesList[index].stats.uptime}%`}/>
+                                                </td>
+                                                <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
+                                            </tr>
+                                            : ''
+                                ))
+                            }
+                            {
+                                this.state.nodeIdentifiers.map(((key, index) =>
+                                        !pinnedNodes.includes(this.state.nodesList[index].id) && !this.state.hideNonPinned ?
+                                            <tr>
+                                                <td><a onClick={function () {
+                                                    setPinnedNode(this.state.nodesList[index].id)
+                                                }.bind(this)}>
+                                                    <span className="fe fe-square text-muted mb-0"></span>
+                                                </a></td>
+                                                <td>{this.state.nodesList[index].stats.active ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
+                                                    code={this.state.nodesList[index].geo.country.toLowerCase()}
+                                                    svg/> : '?'}</td>
+                                                <td>{this.state.nodesList[index].id}</td>
+                                                <td>
+                                                    <Tooltip title={this.state.nodesList[index].info.node}>
+                                                        <span>{getVersionNumber(this.state.nodesList[index].info.node)}</span>
+                                                    </Tooltip>
+                                                </td>
+                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>
+
+                                                    {this.state.nodesList[index].stats.block.number ?
+                                                        <NumberFormat
+                                                            value={this.state.nodesList[index].stats.block.number}
+                                                            displayType={'text'} thousandSeparator={true}
+                                                            prefix={"# "}/>
+                                                        :
+                                                        <Spinner/>}
+                                                    <span
+                                                        className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}
+                                                        <AttentionWarning
+                                                            highestBlock={this.state.highestBlock || 0}
+                                                            currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                                      </span>
+                                                </td>
+                                                <td>{this.state.nodesList[index].stats.block.received ?
+                                                    <TimeAgo
+                                                        date={this.state.nodesList[index].stats.block.received}
+                                                        formatter={formatter}/> :
+                                                    <Spinner/>}</td>
+                                                <td>{this.state.nodesList[index].stats.pending}</td>
+                                                <Tooltip
+                                                    title={getTicketPercentage(this.state.ticketNumber, this.state.nodesList[index].stats.myTicketNumber)}>
+                                                    <td>{this.state.nodesList[index].stats.myTicketNumber}</td>
+                                                </Tooltip>
+                                                <td>{this.state.nodesList[index].stats.mining ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].stats.syncing ?
+                                                    <span className="text-success">●</span> :
+                                                    <span className="text-danger">●</span>}</td>
+                                                <td>{this.state.nodesList[index].stats.peers}</td>
+                                                <td><ProgressBar now={this.state.nodesList[index].stats.uptime}
+                                                                 label={`${this.state.nodesList[index].stats.uptime}%`}/>
+                                                </td>
+                                                <td className={latencyClass(this.state.nodesList[index].stats.latency)}>{this.state.nodesList[index].stats.latency}ms</td>
+                                            </tr>
+                                            : ''
+                                ))
+                            }
+                            </tbody>
+                        </Table>
+                    </div>
+                </div>
+            </Container>
         </div>
         </body>;
     }
