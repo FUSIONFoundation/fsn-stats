@@ -364,12 +364,12 @@ class Main extends React.Component {
                     <Col md={12}>
                         <div className="alert alert-primary mt-2">
                             <div className="row">
-                                <div className="col-md-6">
+                                <div className="col-6">
                                         <span className={'text-white'}>
                                         This monitor does not represent the entire state of the FUSION Network.
                                         </span>
                                 </div>
-                                <div className="col-md-6 text-md-right">
+                                <div className="col-6 text-md-right">
                                     <a className="text-white" href="https://fusion.org">Learn more about FUSION <i
                                         className="fe fe-external-link mb-0"/></a>
                                 </div>
@@ -511,7 +511,7 @@ class Main extends React.Component {
                             <span
                                 className={'nodes-badge p-1'}>{pinnedNodes.length}</span> : ''}
                         </div>
-                        <div className="mx-auto mt-sm-3">
+                        <div className="mx-auto">
                             {pinnedNodes.length > 0 ? <span className={'ml-3 overflow-auto'}>
                                 Hide non-pinned Nodes {!this.state.hideNonPinned ?
                                 <span className={'fe fe-square'} onClick={() => {
@@ -521,7 +521,7 @@ class Main extends React.Component {
                                 }}></span>}
                             </span> : ''}
                         </div>
-                        <div className="mx-auto mt-sm-3">
+                        <div className="mx-auto">
                             Updating In: <TimeAgo date={this.state.lastUpdatedData}
                                                   formatter={formatter}/>
                         </div>
