@@ -583,7 +583,7 @@ class Main extends React.Component {
                                                 <td>{this.state.nodesList[index].stats.active ?
                                                     <span className="text-success">●</span> :
                                                     <span className="text-danger">●</span>}</td>
-                                                <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
+                                                <td>{this.state.nodesList[index].geo ? <ReactCountryFlag cdnUrl={'/flags/4x3/'}
                                                     code={this.state.nodesList[index].geo.country.toLowerCase()}
                                                     svg/> : '?'}</td>
                                                 <td>{this.state.nodesList[index].id}</td>
@@ -645,7 +645,7 @@ class Main extends React.Component {
                                                 <td>{this.state.nodesList[index].stats.active ?
                                                     <span className="text-success">●</span> :
                                                     <span className="text-danger">●</span>}</td>
-                                                <td>{this.state.nodesList[index].geo ? <ReactCountryFlag
+                                                <td>{this.state.nodesList[index].geo ? <ReactCountryFlag cdnUrl={'/flags/4x3/'}
                                                     code={this.state.nodesList[index].geo.country.toLowerCase()}
                                                     svg/> : '?'}</td>
                                                 <td>{this.state.nodesList[index].id}</td>
