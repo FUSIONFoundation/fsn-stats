@@ -14,7 +14,7 @@ class Populate  {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
                 if (err) {
-                    console.log(err.stack);
+                    // console.log(err.stack);
                     console.error('Could not connect to postgres', err);
                     reject(err);
                 }
@@ -27,7 +27,7 @@ class Populate  {
                                 resolve(res.rowCount)
                             }
                             else {
-                                //console.log(res);
+                                // //console.log(res);
                                 resolve(res.rows[0]);
                             }
                         })
@@ -46,7 +46,7 @@ class Populate  {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
                 if (err) {
-                    console.log(err.stack);
+                    // console.log(err.stack);
                     console.error('Could not connect to postgres', err);
                     reject(err);
                     return;
@@ -57,11 +57,11 @@ class Populate  {
                         text: `INSERT INTO ${node_text}`,
                         values: record
                     }
-                    //console.log(record);
-                    console.log(`Inserting ${record[0]}...`);
+                    // //console.log(record);
+                    // console.log(`Inserting ${record[0]}...`);
                     client.query(query)
                     .then(res => {
-                        console.log(`Inserted`);
+                        // console.log(`Inserted`);
                         client.release();
                         resolve(1);
                         return;
@@ -81,7 +81,7 @@ class Populate  {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
                 if (err) {
-                    console.log(err.stack);
+                    // console.log(err.stack);
                     console.error('Could not connect to postgres', err);
                     reject(err);
                     return;
@@ -90,13 +90,13 @@ class Populate  {
                     record[1] = record[1].replace('T',' ');
                     record[1] = record[1].replace('Z','');
                     record[1] = record[1].replace('.0','+');
-                    //console.log(record[1]);
+                    // //console.log(record[1]);
                     const query =
                          `UPDATE nodes SET utctime     = '${record[1]}', block = ${record[2]}, stats = '${record[3]}', info = '${record[4]}' WHERE id = '${record[0]}'`;
-                    //console.log(query);
+                    // //console.log(query);
                     client.query(query)
                         .then(res => {
-                            console.log(`Updated ${record[0]}`);
+                            // console.log(`Updated ${record[0]}`);
                             client.release();
                             resolve(res);
                             return;
@@ -112,10 +112,6 @@ class Populate  {
         });
     }
 
-
-
-
-
     nodeDeleteDb(id) {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
@@ -125,7 +121,7 @@ class Populate  {
                 }
                 else {
                     let query = `DELETE FROM nodes WHERE id = '${id}'`;
-                    //console.log(query);
+                    // //console.log(query);
                     client.query(query)
                         .then(res => {
                             client.release();
@@ -151,7 +147,7 @@ class Populate  {
                 else {
                     const query = `DELETE FROM nodes WHERE id IN 
                     (SELECT id FROM nodes WHERE utctime < now() - INTERVAL '${olderThanHours} hours')`;
-                    //console.log(query);
+                    // //console.log(query);
                     client.query(query)
                         .then(res => {
                             client.release();
@@ -171,7 +167,7 @@ class Populate  {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
                 if (err) {
-                    console.log(err.stack);
+                    // console.log(err.stack);
                     console.error('Could not connect to postgres', err);
                     reject(err);
                 }
@@ -181,15 +177,15 @@ class Populate  {
                     let query = `DELETE FROM blocks`;
                     client.query(query)
                         .then(res => {
-                            //console.log('Overwriting old block database');
+                            // //console.log('Overwriting old block database');
                             query = {
                                 text: `INSERT INTO ${block_text}`,
                                 values: record
                             }
-                            console.log(`Inserting blocks...`);
+                            // console.log(`Inserting blocks...`);
                             client.query(query)
                             .then(res => {
-                                console.log(`Inserted`);
+                                // console.log(`Inserted`);
                                 client.release();
                                 resolve(1);
                                 return;
@@ -217,7 +213,7 @@ class Populate  {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
                 if (err) {
-                    console.log(err.stack);
+                    // console.log(err.stack);
                     console.error('Could not connect to postgres', err);
                     reject(err);
                 }
@@ -226,17 +222,17 @@ class Populate  {
                     let query = `DELETE FROM charts`;
                     client.query(query)
                     .then(res => {
-                        //console.log('Overwriting old block database');
+                        // //console.log('Overwriting old block database');
                         let chart_text ='charts(utctime, charts) VALUES($1, $2)';
 
                         query = {
                             text: `INSERT INTO ${chart_text}`,
                             values: record
                         }
-                        console.log(`Inserting charts...`);
+                        // console.log(`Inserting charts...`);
                         client.query(query)
                         .then(res => {
-                            console.log(`Inserted`);
+                            // console.log(`Inserted`);
                             client.release();
                             resolve(1);
                             return;
@@ -253,11 +249,53 @@ class Populate  {
                         console.error(`Query DELETE charts:  FAIL ${err}`);
                         reject(err);
                     })
-
-
-
                 }
+            })
+        });
+    }
 
+    initDbAndTables() {
+        return new Promise(function(resolve, reject) {
+            db.getClient((err,client,done) => {
+                if (err) {
+                    // console.log(err.stack);
+                    console.error('Could not connect to postgres', err);
+                    reject(err);
+                }
+                else {
+
+                    let query = `DELETE FROM charts`;
+
+                    client.query(query)
+                        .then(res => {
+                            // //console.log('Overwriting old block database');
+                            let chart_text ='charts(utctime, charts) VALUES($1, $2)';
+
+                            query = {
+                                text: `INSERT INTO ${chart_text}`,
+                                values: record
+                            }
+                            // console.log(`Inserting charts...`);
+                            client.query(query)
+                                .then(res => {
+                                    // console.log(`Inserted`);
+                                    client.release();
+                                    resolve(1);
+                                    return;
+                                })
+                                .catch(err => {
+                                    client.release();
+                                    console.error(`Query INSERT INTO charts: FAIL ${err}`);
+                                    reject(err);
+                                    return;
+                                });
+                        })
+                        .catch(err => {
+                            client.release();
+                            console.error(`Query DELETE charts:  FAIL ${err}`);
+                            reject(err);
+                        })
+                }
             })
         });
     }

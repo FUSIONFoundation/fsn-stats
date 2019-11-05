@@ -20,43 +20,45 @@ var connect = function(){
     let timestamp = 0;
     let epoch0time = new Date(0);
     utctime = epoch0time.toISOString();
+    pop.initDbAndTables();
+
 
 
     wsclient.onopen = () => {
-        console.log(new Date(), ` WebSocket Client Connected`);
+        // console.log(new Date(), ` WebSocket Client Connected`);
     };
 
 
     wsclient.onerror = function() {
-        console.log(new Date(),` Connection Error`);
+        // console.log(new Date(),` Connection Error`);
     };
 
     wsclient.onmessage = async(data) => {
 
-        //console.log(data.data);
+        // //console.log(data.data);
 
         now = new Date();
 
-        console.log(now, ` Received:  ${data.data.length} bytes`);
+        // console.log(now, ` Received:  ${data.data.length} bytes`);
         let myData = JSON.parse(data.data);
         let currentAction = myData.action;
-        console.log(`Current action is => ${currentAction}`);
+        // console.log(`Current action is => ${currentAction}`);
 
 
         if (currentAction === 'init') {
-            console.log(`Init. => ${myData.data[0]}`);
+            // console.log(`Init. => ${myData.data[0]}`);
             info = JSON.stringify(myData.data[0]);
         };
 
         if (myData.data.id && currentAction === 'block') {
-            console.log(`Block No. => ${myData.data.block.number}`);
+            // console.log(`Block No. => ${myData.data.block.number}`);
             blockNo = myData.data.block.number;
             timestamp = myData.data.block.timestamp;
             utctime = new Date(timestamp*1000).toISOString();    // UTC
 
             blockdata = JSON.stringify(myData.data.block);
 
-            //console.log(`Height => ${myData.data.height}`);
+            // //console.log(`Height => ${myData.data.height}`);
             let recordBlock = [
                 utctime,
                 blockdata
@@ -64,18 +66,18 @@ var connect = function(){
             /*pop.blockPostDb(recordBlock)
             .then( res => {
                 if (res == 0) {
-                    console.log(`Block data write finished`);
+                    // console.log(`Block data write finished`);
                 }
             })
             .catch( err => {
-                console.log(err.stack);
+                // console.log(err.stack);
             })*/
 
         }  // End of currentAction === 'blocks'
 
 
         if (myData.data.id && currentAction === 'stats') {
-            console.log(`User ID => ${myData.data.id}`);
+            // console.log(`User ID => ${myData.data.id}`);
             let statdata = JSON.stringify(myData.data);
             let recordStats = [
                 myData.data.id,
@@ -84,32 +86,32 @@ var connect = function(){
                 statdata,
                 info
             ];
-            //console.log(recordStats);
+            // //console.log(recordStats);
 
-            
+
             //await pop.nodeDeleteDb(recordStats[0])
             pop.nodeUpdateDb(recordStats)
             .then((res) => {
-                //console.log(res);
+                // //console.log(res);
                 if (res.rowCount == 0) {
                     pop.nodePostDb(recordStats)
                     .then( res => {
                         if (res == 1) {
-                            //console.log(`Posted`);
+                            // //console.log(`Posted`);
                         }
                         else {
-                            console.log(`Unidentified return from nodePostDb = ${res}`);
+                            // console.log(`Unidentified return from nodePostDb = ${res}`);
                         }
                     })
                     .catch( err => {
-                        //console.log(err.stack);
-                        console.log(err.detail);
+                        // //console.log(err.stack);
+                        // console.log(err.detail);
                         return;
                     })
                 }
             })
             .catch( err => {
-                //console.log(err);
+                // //console.log(err);
                 console.error(err.stack);
             })
 
@@ -125,11 +127,11 @@ var connect = function(){
             pop.chartPostDb(recordCharts)
             .then( res => {
                 if (res == 0) {
-                    console.log(`Chart data write finished`);
+                    // console.log(`Chart data write finished`);
                 }
             })
             .catch( err => {
-                console.log(err.stack);
+                // console.log(err.stack);
             })
         }
 
@@ -141,10 +143,10 @@ var connect = function(){
             removeOldNodes(olderThanHours);
             pop.nodeDeleteOldNodes(this.olderThanHours)
             .then( res => {
-                console.log(`Removed old nodes ${res}`);
+                // console.log(`Removed old nodes ${res}`);
             })
             .catch( err => {
-                console.log(err.stack);
+                // console.log(err.stack);
             })
         }, checkTime)
     }
@@ -152,16 +154,16 @@ var connect = function(){
     function keepAlive() {
         var timeout = 10000;
         if (wsclient.readyState == wsclient.OPEN) {
-            //console.log('Keep alive');
+            // //console.log('Keep alive');
             wsclient.send('');
         }
         timerId = setTimeout(keepAlive, timeout);
     }
 
     wsclient.onclose = function() {
-        console.log(new Date(), ' Client closed, attempting to restart after a delay');
+        // console.log(new Date(), ' Client closed, attempting to restart after a delay');
         setTimeout(connect, reconnectInterval);
-        console.log(new Date(), ' Websocket will attempt to reopen in ',reconnectInterval/1000,' seconds');
+        // console.log(new Date(), ' Websocket will attempt to reopen in ',reconnectInterval/1000,' seconds');
     };
 
     function cancelKeepAlive() {

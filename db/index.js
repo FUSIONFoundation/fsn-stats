@@ -5,7 +5,7 @@ const pool = new Pool({
     host:       process.env.SQLHOST || 'localhost',
     port:       5432,
     database:   'myfusiondatabase',
-    password:   process.env.SQLPASS || '',
+    password:   process.env.SQLPASS || 'postgres',
     max:        5
 });
 
