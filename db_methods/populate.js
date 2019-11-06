@@ -112,10 +112,6 @@ class Populate  {
         });
     }
 
-
-
-
-
     nodeDeleteDb(id) {
         return new Promise(function(resolve, reject) {
             db.getClient((err,client,done) => {
@@ -186,7 +182,7 @@ class Populate  {
                                 text: `INSERT INTO ${block_text}`,
                                 values: record
                             }
-                            console.log(`Inserting blocks...`);
+                      //      console.log(`Inserting blocks...`);
                             client.query(query)
                             .then(res => {
                                 console.log(`Inserted`);
@@ -233,7 +229,7 @@ class Populate  {
                             text: `INSERT INTO ${chart_text}`,
                             values: record
                         }
-                        console.log(`Inserting charts...`);
+                      //  console.log(`Inserting charts...`);
                         client.query(query)
                         .then(res => {
                             console.log(`Inserted`);
@@ -253,11 +249,53 @@ class Populate  {
                         console.error(`Query DELETE charts:  FAIL ${err}`);
                         reject(err);
                     })
-
-
-
                 }
+            })
+        });
+    }
 
+    initDbAndTables() {
+        return new Promise(function(resolve, reject) {
+            db.getClient((err,client,done) => {
+                if (err) {
+                    console.log(err.stack);
+                    console.error('Could not connect to postgres', err);
+                    reject(err);
+                }
+                else {
+
+                    let query = `DELETE FROM charts`;
+
+                    client.query(query)
+                        .then(res => {
+                            //console.log('Overwriting old block database');
+                            let chart_text ='charts(utctime, charts) VALUES($1, $2)';
+
+                            query = {
+                                text: `INSERT INTO ${chart_text}`,
+                                values: record
+                            }
+                           // console.log(`Inserting charts...`);
+                            client.query(query)
+                                .then(res => {
+                              //      console.log(`Inserted`);
+                                    client.release();
+                                    resolve(1);
+                                    return;
+                                })
+                                .catch(err => {
+                                    client.release();
+                                    console.error(`Query INSERT INTO charts: FAIL ${err}`);
+                                    reject(err);
+                                    return;
+                                });
+                        })
+                        .catch(err => {
+                            client.release();
+                            console.error(`Query DELETE charts:  FAIL ${err}`);
+                            reject(err);
+                        })
+                }
             })
         });
     }
