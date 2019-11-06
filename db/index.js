@@ -14,9 +14,9 @@ const pool = new Pool({
      query: (text, params, callback) => {
          return pool.query(text, params, callback)
      },
-       getClient: (callback) => {
-           pool.connect((err, client, done) => {
-               callback(err, client, done)
-           })
-       }
+     getClient: (callback) => {
+        pool.connect((err, client, done) => {
+            callback(err, client, done)
+        })
+     }
  }

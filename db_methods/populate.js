@@ -1,7 +1,7 @@
 'use strict'
 
-//const autoBind = require('auto-bind');
 const db = require('../db');
+
 
 
 class Populate  {

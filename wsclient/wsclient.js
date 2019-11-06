@@ -11,6 +11,7 @@ let info = null;
 
 var connect = function(){
 
+    
     //const wsclient = new WebSocketClient('ws://127.0.0.1:3000/primus');
     const wsclient = new WebSocketClient('wss://node.fusionnetwork.io/primus');
 

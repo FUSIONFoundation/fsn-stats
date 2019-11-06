@@ -1,1 +1,0 @@
-CREATE TABLE charts ( utctime TEXT, charts TEXT );
