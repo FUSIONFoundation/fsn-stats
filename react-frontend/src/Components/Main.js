@@ -160,6 +160,9 @@ class Main extends React.Component {
             await processBlocks(stats.stats.block, id);
         }
 
+
+        let totalTickets = 0;
+
         const processBlocks = async (data, id) => {
             data.id = id;
             let objIndex = allNodes.findIndex((value => value.id === data.id));
@@ -176,6 +179,7 @@ class Main extends React.Component {
                 if (data.number > highestBlock) {
                     highestBlock = data.number;
                     lastUpdatedBlock = data.received;
+                    totalTickets = data.ticketNumber;
                     pendingTransactions = allNodes[objIndex].stats.pending;
                 }
 
@@ -191,7 +195,7 @@ class Main extends React.Component {
                         nodesList: allNodes,
                         highestBlock: highestBlock,
                         lastUpdatedBlock: lastUpdatedBlock,
-                        ticketNumber: data.ticketNumber,
+                        ticketNumber: totalTickets,
                         lastUpdatedData: Date.now() + 5000,
                         pendingTransactions: pendingTransactions
                     })
