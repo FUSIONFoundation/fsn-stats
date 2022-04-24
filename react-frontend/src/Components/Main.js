@@ -83,7 +83,7 @@ class Main extends React.Component {
             if (data.data.length > 0) processCharts(data);
         });
 
-
+        let highestVersion = "";
         let highestBlock = 0;
         let lastUpdatedBlock = 0;
         let pendingTransactions = 0;
@@ -111,6 +111,12 @@ class Main extends React.Component {
             });
         }
 
+        const getVersionNumber = (string) => {
+            let vIndex = string.indexOf('v');
+            let minV = string.substr(vIndex + 1, string.length);
+            let dashIndex = minV.indexOf('-');
+            return minV.substr(0, dashIndex);
+        }
 
         let geoCharts = [];
         const processStats = async (data) => {
@@ -157,13 +163,13 @@ class Main extends React.Component {
                 this.forceUpdate();
             }
 
-            await processBlocks(stats.stats.block, id);
+            await processBlocks(stats.stats.block, id, getVersionNumber(stats.info.node));
         }
 
 
         let totalTickets = 0;
 
-        const processBlocks = async (data, id) => {
+        const processBlocks = async (data, id, version) => {
             data.id = id;
             let objIndex = allNodes.findIndex((value => value.id === data.id));
             if (objIndex === -1) {
@@ -176,21 +182,33 @@ class Main extends React.Component {
                     };
                 }
 
-                if (data.number > highestBlock) {
+                if (version > highestVersion) {
+                    highestVersion = version;
+                }
+
+                if (version === highestVersion && data.number > highestBlock) {
                     highestBlock = data.number;
                     lastUpdatedBlock = data.received;
                     totalTickets = data.ticketNumber;
                     pendingTransactions = allNodes[objIndex].stats.pending;
                 }
 
-
+                allNodes[objIndex].version = version;
                 allNodes[objIndex].height = data.number;
                 allNodes[objIndex].propagationChart = propagationChart;
                 allNodes[objIndex].hash = formatHash(data.hash);
                 allNodes[objIndex].blockLastUpdated = (data.received * 1000);
 
                 if (Object.keys(allNodes).length === totalNodes) {
-                    allNodes.sort((a, b) => b.height - a.height);
+                    allNodes.sort((a, b) => {
+                        if (a.version < b.version) {
+                            return 1;
+                        } else if (a.version > b.version) {
+                            return -1;
+                        } else {
+                            return b.height - a.height;
+                        }
+                    });
                     this.setState({
                         nodesList: allNodes,
                         highestBlock: highestBlock,
