@@ -1,61 +1,24 @@
 import React from 'react';
-import {
-    Card,
-    Row,
-    Col,
-    Container,
-    Badge,
-    Button,
-    Nav,
-    ProgressBar,
-    Navbar,
-    NavbarBrand,
-    NavDropdown,
-    Table,
-    Modal,
-    Form,
-    FormControl
-} from 'react-bootstrap'
-import Fade from 'react-reveal/Fade';
+import {Button, Col, Container, Modal, ProgressBar, Row, Table,} from 'react-bootstrap'
 import NumberFormat from 'react-number-format';
 import Tooltip from '@material-ui/core/Tooltip';
 import Delay from './Delay';
 import axios from 'axios';
 import Datamap from 'react-datamaps';
 import ReactCountryFlag from "react-country-flag";
-import CountUp from 'react-countup';
-import Countdown from 'react-countdown-now';
-import Skeleton, {SkeletonTheme} from 'react-loading-skeleton';
 import TimeAgo from 'react-timeago';
-import ReactTooltip from 'react-tooltip'
 import customStrings from './timeAgo/customStrings'
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
 import Spinner from './Spinner';
 import AttentionWarning from './AttentionWarning';
-import {
-    BarChart,
-    ComposedChart,
-    ChartTooltip,
-    ResponsiveContainer,
-    Line,
-    Bar,
-    YAxis,
-    Legend,
-    XAxis,
-    CartesianGrid
-} from 'recharts';
-import FontAwesome from 'react-loading-skeleton';
-import * as Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
 import FusionLogo from '../img/Fusion_White.svg';
-import {Scrollbars} from 'react-custom-scrollbars';
 
 
 class Main extends React.Component {
     constructor(props) {
         super(props);
 
-        let URL = 'http://stats.fusionnetwork.io:3002';
+        let URL = 'https://api-stats.fusionnetwork.io';
         let allNodes = [];
         let identifiers = [];
 
@@ -66,56 +29,54 @@ class Main extends React.Component {
             axios.get(`${URL}/nodes`).then(async function (data) {
                 let nodeData = data.data;
                 for (let node in nodeData) {
-                    if (nodeData[node].id.indexOf('★GoFSN.com|t.me/gofusion★') === -1) {
-                        countNodes++;
-                        if (nodeData.length === (parseInt(node) + 1)) {
-                            totalNodes = countNodes;
-                        }
-                        processStats(nodeData[node]);
+                    countNodes++;
+                    if (nodeData.length === (parseInt(node) + 1)) {
+                        totalNodes = countNodes;
                     }
+                    processStats(nodeData[node]);
                 }
             });
         }
 
         getData();
 
-        axios.get(`${URL}/charts`).then(function (data) {
-            if (data.data.length > 0) processCharts(data);
-        });
+        // axios.get(`${URL}/charts`).then(function (data) {
+        //     if (data.data.length > 0) processCharts(data);
+        // });
 
         let highestVersion = "";
         let highestBlock = 0;
         let lastUpdatedBlock = 0;
         let pendingTransactions = 0;
-        const processCharts = (data) => {
-            let chartData = JSON.parse(data.data[0].charts);
-            // let highestBlock = Math.max(...chartData.height);
-            let heightChart = chartData.height;
-            let avgBlockTime = chartData.avgBlocktime.toString().substr(0, 5);
-            let difficulty = Math.max(...chartData.difficulty);
-
-            let blocksChart = [];
-
-            for (let i in chartData.blocktime) {
-                blocksChart[i] = {
-                    "blocktime": chartData.blocktime[i],
-                    "height": chartData.height[i]
-                };
-            }
-
-            this.setState({
-                chartData: heightChart,
-                avgBlockTime: avgBlockTime,
-                difficulty: difficulty,
-                avgBlockTimeChart: blocksChart
-            });
-        }
+        // const processCharts = (data) => {
+        //     let chartData = JSON.parse(data.data[0].charts);
+        //     // let highestBlock = Math.max(...chartData.height);
+        //     let heightChart = chartData.height;
+        //     let avgBlockTime = chartData.avgBlocktime.toString().substr(0, 5);
+        //     let difficulty = Math.max(...chartData.difficulty);
+        //
+        //     let blocksChart = [];
+        //
+        //     for (let i in chartData.blocktime) {
+        //         blocksChart[i] = {
+        //             "blocktime": chartData.blocktime[i],
+        //             "height": chartData.height[i]
+        //         };
+        //     }
+        //
+        //     this.setState({
+        //         chartData: heightChart,
+        //         avgBlockTime: avgBlockTime,
+        //         difficulty: difficulty,
+        //         avgBlockTimeChart: blocksChart
+        //     });
+        // }
 
         const getVersionNumber = (string) => {
             let vIndex = string.indexOf('v');
-            let minV = string.substr(vIndex + 1, string.length);
+            let minV = string.substring(vIndex + 1, string.length);
             let dashIndex = minV.indexOf('-');
-            return minV.substr(0, dashIndex);
+            return minV.substring(0, dashIndex);
         }
 
         let geoCharts = [];
@@ -222,16 +183,15 @@ class Main extends React.Component {
                     identifiers = [];
                     setTimeout(function () {
                         getData()
-                    }, 5000)
+                    }, 10000)
                 }
             }
         }
 
         const formatHash = (hash) => {
             let a = hash.length;
-            let b = hash.substr(0, 4);
-            let c = b + ' ... ' + hash.substr(a - 4, a);
-            return c;
+            let b = hash.substring(0, 4);
+            return b + ' ... ' + hash.substring(a - 4, a);
         }
     }
 
@@ -239,7 +199,7 @@ class Main extends React.Component {
     state = {
         highestBlock: undefined,
         chartData: {},
-        avgBlockTime: 0,
+        avgBlockTime: 12.99,
         difficulty: 0,
         nodesList: [],
         nodeIdentifiers: [],
@@ -274,16 +234,15 @@ class Main extends React.Component {
                     hideNonPinned: false
                 })
             }
-            ;
 
             this.forceUpdate();
         }
 
         const getVersionNumber = (string) => {
             let vIndex = string.indexOf('v');
-            let minV = string.substr(vIndex + 1, string.length);
+            let minV = string.substring(vIndex + 1, string.length);
             let dashIndex = minV.indexOf('-');
-            return minV.substr(0, dashIndex);
+            return minV.substring(0, dashIndex);
         }
 
 
@@ -295,7 +254,6 @@ class Main extends React.Component {
                     return 'text-danger';
                 }
             }
-            ;
         }
 
         const latencyClass = (latency) => {
@@ -305,19 +263,6 @@ class Main extends React.Component {
                 return 'text-danger';
             }
         };
-
-        const RoundedBar = (props) => {
-            const {fill, x, y, height} = props;
-
-            return (
-                <g>
-                    <rect id="Rectangle-3" x={x} y={y} width="3" height={height} fill={fill} rx="1"/>
-                    <rect id="Rectangle-3" x={x - 1} y="0" width="4" height="80" fill={fill} fillOpacity="0" rx="1"/>
-                </g>
-            );
-        };
-
-        let show = false;
 
         const setShow = (state, id) => {
             return this.setState({
@@ -329,7 +274,6 @@ class Main extends React.Component {
         const handleClose = () => setShow(false);
         const handleShow = () => setShow(true);
 
-        let hideNonPinned = false;
         const setNonPinned = (state) => {
             this.setState({
                 hideNonPinned: state
