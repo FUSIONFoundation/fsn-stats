@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import {Button, Col, Container, Modal, ProgressBar, Row, Table,} from 'react-bootstrap'
 import NumberFormat from 'react-number-format';
@@ -541,7 +542,7 @@ class Main extends React.Component {
                                 this.state.nodeIdentifiers.map(((key, index) =>
                                         pinnedNodes.includes(this.state.nodesList[index].id) ?
                                             <tr>
-                                                <td><a href="" onClick={function () {
+                                                <td><a onClick={function () {
                                                     removePinnedNode(this.state.nodesList[index].id)
                                                 }.bind(this)}>
                                                     <span className="fe fe-minus-square text-muted mb-0"></span>
@@ -603,7 +604,7 @@ class Main extends React.Component {
                                 this.state.nodeIdentifiers.map(((key, index) =>
                                         !pinnedNodes.includes(this.state.nodesList[index].id) && !this.state.hideNonPinned ?
                                             <tr>
-                                                <td><a href="" onClick={function () {
+                                                <td><a onClick={function () {
                                                     setPinnedNode(this.state.nodesList[index].id)
                                                 }.bind(this)}>
                                                     <span className="fe fe-square text-muted mb-0"></span>
