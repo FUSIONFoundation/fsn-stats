@@ -31,12 +31,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      - name: goto folder
-        run: cd react-frontend
       - name: Install dependencies
-        run: npm install
+        run: cd react-frontend && npm install
       - name: Build
-        run: npm run build
+        run: cd react-frontend && npm run build
       # - name: Deploy
       #   uses: jakejarvis/s3-sync-action@master
       #   with:
