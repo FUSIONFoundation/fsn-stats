@@ -25,7 +25,7 @@
     "react-timeago": "^4.4.0",
     "react-toastify": "^5.4.0",
     "react-tooltip": "^3.11.1",
-    "recharts": "^1.7.1",
+    "recharts": "^2.1.14",
     "websocket": "^1.0.30"
   },
   "scripts": {
