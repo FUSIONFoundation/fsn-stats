@@ -541,7 +541,7 @@ class Main extends React.Component {
                                 this.state.nodeIdentifiers.map(((key, index) =>
                                         pinnedNodes.includes(this.state.nodesList[index].id) ?
                                             <tr>
-                                                <td><a onClick={function () {
+                                                <td><a href="" onClick={function () {
                                                     removePinnedNode(this.state.nodesList[index].id)
                                                 }.bind(this)}>
                                                     <span className="fe fe-minus-square text-muted mb-0"></span>
@@ -603,7 +603,7 @@ class Main extends React.Component {
                                 this.state.nodeIdentifiers.map(((key, index) =>
                                         !pinnedNodes.includes(this.state.nodesList[index].id) && !this.state.hideNonPinned ?
                                             <tr>
-                                                <td><a onClick={function () {
+                                                <td><a href="" onClick={function () {
                                                     setPinnedNode(this.state.nodesList[index].id)
                                                 }.bind(this)}>
                                                     <span className="fe fe-square text-muted mb-0"></span>
