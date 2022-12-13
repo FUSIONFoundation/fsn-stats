@@ -247,8 +247,10 @@ class Main extends React.Component {
         }
 
 
-        const blockClass = (nodeBlock, highestBlock) => {
-            if (highestBlock && nodeBlock) {
+        const blockClass = (nodeBlock, highestBlock, version) => {
+            if (parseInt(version.substring(0, 1)) < 5) {
+                return 'text-danger';
+            } else if (highestBlock && nodeBlock) {
                 if ((highestBlock - nodeBlock) === 1) {
                     return 'text-warn';
                 } else if ((highestBlock - nodeBlock) > 1) {
@@ -559,7 +561,7 @@ class Main extends React.Component {
                                                         <span>{getVersionNumber(this.state.nodesList[index].info.node)}</span>
                                                     </Tooltip>
                                                 </td>
-                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>
+                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock, getVersionNumber(this.state.nodesList[index].info.node))}>
 
                                                     {this.state.nodesList[index].stats.block.number ?
                                                         <NumberFormat
@@ -622,7 +624,7 @@ class Main extends React.Component {
                                                         <span>{getVersionNumber(this.state.nodesList[index].info.node)}</span>
                                                     </Tooltip>
                                                 </td>
-                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock)}>
+                                                <td className={blockClass(this.state.nodesList[index].stats.block.number, this.state.highestBlock, getVersionNumber(this.state.nodesList[index].info.node))}>
 
                                                     {this.state.nodesList[index].stats.block.number ?
                                                         <NumberFormat
