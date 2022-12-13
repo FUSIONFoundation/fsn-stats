@@ -572,7 +572,8 @@ class Main extends React.Component {
                                                         className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}
                                                         <AttentionWarning
                                                             highestBlock={this.state.highestBlock || 0}
-                                                            currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                            currentBlock={this.state.nodesList[index].stats.block.number}
+                                                            version={getVersionNumber(this.state.nodesList[index].info.node)}/>
                                                                       </span>
                                                 </td>
                                                 <td>{this.state.nodesList[index].stats.block.received ?
@@ -634,7 +635,8 @@ class Main extends React.Component {
                                                         className={'pl-4'}>{this.state.nodesList[index].stats.block.hash}
                                                         <AttentionWarning
                                                             highestBlock={this.state.highestBlock || 0}
-                                                            currentBlock={this.state.nodesList[index].stats.block.number}/>
+                                                            currentBlock={this.state.nodesList[index].stats.block.number}
+                                                            version={getVersionNumber(this.state.nodesList[index].info.node)}/>
                                                                       </span>
                                                 </td>
                                                 <td>{this.state.nodesList[index].stats.block.received ?
